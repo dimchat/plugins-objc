@@ -39,7 +39,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DIMBaseFileFactory : NSObject <MKMPortableNetworkFileFactory>
+@interface DIMBaseFileFactory : NSObject <MKPortableNetworkFileFactory>
 
 @end
 

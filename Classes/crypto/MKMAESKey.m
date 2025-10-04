@@ -52,8 +52,8 @@ static inline NSData *random_data(NSUInteger size) {
 @property (readonly, nonatomic) NSUInteger keySize;
 @property (readonly, nonatomic) NSUInteger blockSize;
 
-@property (strong, nonatomic) id<MKMTransportableData> keyData;  // Key Data
-@property (strong, nonatomic) id<MKMTransportableData> ivData;   // Initialization Vector
+@property (strong, nonatomic) id<MKTransportableData> keyData;  // Key Data
+@property (strong, nonatomic) id<MKTransportableData> ivData;   // Initialization Vector
 
 @end
 
@@ -78,7 +78,7 @@ static inline NSData *random_data(NSUInteger size) {
 }
 
 - (void)_generate {
-    id<MKMTransportableData> ted;
+    id<MKTransportableData> ted;
     
     //
     // key data empty? generate new key info
@@ -87,14 +87,14 @@ static inline NSData *random_data(NSUInteger size) {
     // random password
     NSUInteger keySize = [self keySize];
     NSData *pw = random_data(keySize);
-    ted = MKMTransportableDataCreate(pw, nil);
+    ted = MKTransportableDataCreate(pw, nil);
     [self setObject:ted.object forKey:@"data"];
     _keyData = ted;
     
     // random initialization vector
     NSUInteger blockSize = [self blockSize];
     NSData *iv = random_data(blockSize);
-    ted = MKMTransportableDataCreate(iv, nil);
+    ted = MKTransportableDataCreate(iv, nil);
     [self setObject:ted.object forKey:@"iv"];
     _ivData = ted;
     
@@ -139,12 +139,12 @@ static inline NSData *random_data(NSUInteger size) {
     }
 }
 
-- (id<MKMTransportableData>)ivData {
-    id<MKMTransportableData> ted = _ivData;
+- (id<MKTransportableData>)ivData {
+    id<MKTransportableData> ted = _ivData;
     if (!ted) {
         id base64 = [self objectForKey:@"iv"];
         if (base64) {
-            _ivData = ted = MKMTransportableDataParse(base64);
+            _ivData = ted = MKTransportableDataParse(base64);
             NSAssert(ted, @"iv data error: %@", base64);
         } else {
             // zero iv
@@ -155,15 +155,15 @@ static inline NSData *random_data(NSUInteger size) {
 - (void)_setInitVector:(id)base64 {
     // if new iv not exists, this will erase the decoded ivData,
     // and cause reloading from dictionary again.
-    _ivData = MKMTransportableDataParse(base64);
+    _ivData = MKTransportableDataParse(base64);
 }
 
-- (id<MKMTransportableData>)keyData {
-    id<MKMTransportableData> ted = _keyData;
+- (id<MKTransportableData>)keyData {
+    id<MKTransportableData> ted = _keyData;
     if (!ted) {
         id base64 = [self objectForKey:@"data"];
         if (base64) {
-            _keyData = ted = MKMTransportableDataParse(base64);
+            _keyData = ted = MKTransportableDataParse(base64);
             NSAssert(ted, @"key data error: %@", base64);
         } else {
             NSAssert(false, @"key data not found: %@", self);
@@ -173,26 +173,26 @@ static inline NSData *random_data(NSUInteger size) {
 }
 
 - (NSString *)_ivString {
-    id<MKMTransportableData> ted = [self ivData];
+    id<MKTransportableData> ted = [self ivData];
     NSString *base64 = [ted string];
     // TODO: trim base64 string
     return base64;
 }
 
 - (NSString *)_keyString {
-    id<MKMTransportableData> ted = [self keyData];
+    id<MKTransportableData> ted = [self keyData];
     NSString *base64 = [ted string];
     // TODO: trim base64 string
     return base64;
 }
 
 - (NSData *)data {
-    id<MKMTransportableData> ted = [self keyData];
+    id<MKTransportableData> ted = [self keyData];
     return [ted data];
 }
 
 - (NSData *)iv {
-    id<MKMTransportableData> ted = [self ivData];
+    id<MKTransportableData> ted = [self ivData];
     return [ted data];
 }
 

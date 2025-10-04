@@ -39,7 +39,7 @@
 
 #import "DIMBaseDataFactory.h"
 
-@interface Base64Data : MKMDictionary <MKMTransportableData> {
+@interface Base64Data : MKDictionary <MKTransportableData> {
     
     DIMBaseDataWrapper *_wrapper;
 }
@@ -109,11 +109,11 @@
 
 @implementation DIMBase64DataFactory
 
-- (id<MKMTransportableData>)createTransportableData:(NSData *)data {
+- (id<MKTransportableData>)createTransportableData:(NSData *)data {
     return [[Base64Data alloc] initWithData:data];
 }
 
-- (nullable id<MKMTransportableData>)parseTransportableData:(NSDictionary *)ted {
+- (nullable id<MKTransportableData>)parseTransportableData:(NSDictionary *)ted {
     // TODO: 1. check algorithm
     //       2. check data format
     return [[Base64Data alloc] initWithDictionary:ted];

@@ -42,35 +42,35 @@
 
 #import "DIMDataDigesters.h"
 
-@interface MD5 : NSObject <MKMDataDigester>
+//@interface MD5 : NSObject <MKMessageDigester>
+//
+//@end
+//
+//@implementation MD5
+//
+//- (NSData *)digest:(NSData *)data {
+//    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+//    CC_MD5([data bytes], (CC_LONG)[data length], digest);
+//    return [[NSData alloc] initWithBytes:digest length:CC_MD5_DIGEST_LENGTH];
+//}
+//
+//@end
+//
+//@interface SHA1 : NSObject <MKMessageDigester>
+//
+//@end
+//
+//@implementation SHA1
+//
+//- (NSData *)digest:(NSData *)data {
+//    unsigned char digest[CC_SHA1_DIGEST_LENGTH];
+//    CC_SHA1([data bytes], (CC_LONG)[data length], digest);
+//    return [[NSData alloc] initWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
+//}
+//
+//@end
 
-@end
-
-@implementation MD5
-
-- (NSData *)digest:(NSData *)data {
-    unsigned char digest[CC_MD5_DIGEST_LENGTH];
-    CC_MD5([data bytes], (CC_LONG)[data length], digest);
-    return [[NSData alloc] initWithBytes:digest length:CC_MD5_DIGEST_LENGTH];
-}
-
-@end
-
-@interface SHA1 : NSObject <MKMDataDigester>
-
-@end
-
-@implementation SHA1
-
-- (NSData *)digest:(NSData *)data {
-    unsigned char digest[CC_SHA1_DIGEST_LENGTH];
-    CC_SHA1([data bytes], (CC_LONG)[data length], digest);
-    return [[NSData alloc] initWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
-}
-
-@end
-
-@interface SHA256 : NSObject <MKMDataDigester>
+@interface SHA256 : NSObject <MKMessageDigester>
 
 @end
 
@@ -84,7 +84,7 @@
 
 @end
 
-@interface RIPEMD160 : NSObject <MKMDataDigester>
+@interface RIPEMD160 : NSObject <MKMessageDigester>
 
 @end
 
@@ -99,7 +99,7 @@
 
 @end
 
-@interface KECCAK256 : NSObject <MKMDataDigester>
+@interface KECCAK256 : NSObject <MKMessageDigester>
 
 @end
 
@@ -118,20 +118,20 @@
 void DIMRegisterDataDigesters(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if ([MKMMD5 getDigester] == nil) {
-            [MKMMD5 setDigester:[[MD5 alloc] init]];
+//        if ([MKMD5 getDigester] == nil) {
+//            [MKMD5 setDigester:[[MD5 alloc] init]];
+//        }
+//        if ([MKSHA1 getDigester] == nil) {
+//            [MKSHA1 setDigester:[[SHA1 alloc] init]];
+//        }
+        if ([MKSHA256 getDigester] == nil) {
+            [MKSHA256 setDigester:[[SHA256 alloc] init]];
         }
-        if ([MKMSHA1 getDigester] == nil) {
-            [MKMSHA1 setDigester:[[SHA1 alloc] init]];
+        if ([MKRIPEMD160 getDigester] == nil) {
+            [MKRIPEMD160 setDigester:[[RIPEMD160 alloc] init]];
         }
-        if ([MKMSHA256 getDigester] == nil) {
-            [MKMSHA256 setDigester:[[SHA256 alloc] init]];
-        }
-        if ([MKMRIPEMD160 getDigester] == nil) {
-            [MKMRIPEMD160 setDigester:[[RIPEMD160 alloc] init]];
-        }
-        if ([MKMKECCAK256 getDigester] == nil) {
-            [MKMKECCAK256 setDigester:[[KECCAK256 alloc] init]];
+        if ([MKKECCAK256 getDigester] == nil) {
+            [MKKECCAK256 setDigester:[[KECCAK256 alloc] init]];
         }
     });
 }

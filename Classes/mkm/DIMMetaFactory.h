@@ -45,9 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMMetaFactory : NSObject <MKMMetaFactory>
 
-@property (readonly, nonatomic) MKMMetaType type;
+@property (readonly, nonatomic) NSString *type;
 
-- (instancetype)initWithType:(MKMMetaType)version;
+- (instancetype)initWithType:(NSString *)version;
 
 @end
 

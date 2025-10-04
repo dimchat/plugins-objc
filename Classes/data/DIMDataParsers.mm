@@ -37,7 +37,7 @@
 
 #import "DIMDataParsers.h"
 
-@interface JSON : NSObject <MKMObjectCoder>
+@interface JSON : NSObject <MKObjectCoder>
 
 @end
 
@@ -72,7 +72,7 @@
 
 @end
 
-@interface UTF8 : NSObject <MKMStringCoder>
+@interface UTF8 : NSObject <MKStringCoder>
 
 @end
 
@@ -100,11 +100,11 @@
 void DIMRegisterDataParsers(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if ([MKMJSON getCoder] == nil) {
-            [MKMJSON setCoder:[[JSON alloc] init]];
+        if ([MKJSON getCoder] == nil) {
+            [MKJSON setCoder:[[JSON alloc] init]];
         }
-        if ([MKMUTF8 getCoder] == nil) {
-            [MKMUTF8 setCoder:[[UTF8 alloc] init]];
+        if ([MKUTF8 getCoder] == nil) {
+            [MKUTF8 setCoder:[[UTF8 alloc] init]];
         }
     });
 }

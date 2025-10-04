@@ -39,15 +39,15 @@
 
 #import "DIMBaseFileFactory.h"
 
-@interface BaseNetworkFile : MKMDictionary <MKMPortableNetworkFile> {
+@interface BaseNetworkFile : MKDictionary <MKPortableNetworkFile> {
     
     DIMBaseFileWrapper *_wrapper;
 }
 
-- (instancetype)initWithData:(nullable id<MKMTransportableData>)data
+- (instancetype)initWithData:(nullable id<MKTransportableData>)data
                     filename:(nullable NSString *)name
                          url:(nullable NSURL *)locator
-                    password:(nullable id<MKMDecryptKey>)key;
+                    password:(nullable id<MKDecryptKey>)key;
 
 @end
 
@@ -69,10 +69,10 @@
     return self;
 }
 
-- (instancetype)initWithData:(nullable id<MKMTransportableData>)data
+- (instancetype)initWithData:(nullable id<MKTransportableData>)data
                     filename:(nullable NSString *)name
                          url:(nullable NSURL *)locator
-                    password:(nullable id<MKMDecryptKey>)key {
+                    password:(nullable id<MKDecryptKey>)key {
     if (self = [self init]) {
         // file data
         if (data) {
@@ -118,11 +118,11 @@
     [_wrapper setURL:url];
 }
 
-- (id<MKMDecryptKey>)password {
+- (id<MKDecryptKey>)password {
     return [_wrapper password];
 }
 
-- (void)setPassword:(id<MKMDecryptKey>)password {
+- (void)setPassword:(id<MKDecryptKey>)password {
     [_wrapper setPassword:password];
 }
 
@@ -133,7 +133,7 @@
         return urlString;
     }
     // not a single URL, encode the entire dictionary
-    return MKMJSONMapEncode([self dictionary]);
+    return MKJsonMapEncode([self dictionary]);
 }
 
 - (NSObject *)object {
@@ -164,17 +164,17 @@
 
 @implementation DIMBaseFileFactory
 
-- (id<MKMPortableNetworkFile>)createPortableNetworkFile:(id<MKMTransportableData>)data
-                                               filename:(NSString *)name
-                                                    url:(NSURL *)locator
-                                               password:(id<MKMDecryptKey>)key {
+- (id<MKPortableNetworkFile>)createPortableNetworkFile:(id<MKTransportableData>)data
+                                              filename:(NSString *)name
+                                                   url:(NSURL *)locator
+                                              password:(id<MKDecryptKey>)key {
     return [[BaseNetworkFile alloc] initWithData:data
                                         filename:name
                                              url:locator
                                         password:key];
 }
 
-- (id<MKMPortableNetworkFile>)parsePortableNetworkFile:(NSDictionary *)pnf {
+- (id<MKPortableNetworkFile>)parsePortableNetworkFile:(NSDictionary *)pnf {
     return [[BaseNetworkFile alloc] initWithDictionary:pnf];
 }
 

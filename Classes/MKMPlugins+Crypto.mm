@@ -175,19 +175,19 @@ static PlainKey *s_sharedPlainKey = nil;
 
 @end
 
-@interface PrivateKeyFactory : KeyFactory <MKMPrivateKeyFactory>
+@interface PrivateKeyFactory : KeyFactory <MKPrivateKeyFactory>
 
 @end
 
 @implementation PrivateKeyFactory
 
-- (id<MKMPrivateKey>)generatePrivateKey {
+- (id<MKPrivateKey>)generatePrivateKey {
     NSMutableDictionary *key = [[NSMutableDictionary alloc] init];
     [key setObject:self.algorithm forKey:@"algorithm"];
     return [self parsePrivateKey:key];
 }
 
-- (nullable id<MKMPrivateKey>)parsePrivateKey:(NSDictionary *)key {
+- (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
     // RSA key
     if ([self.algorithm isEqualToString:MKMAlgorithm_RSA]) {
         return [[MKMRSAPrivateKey alloc] initWithDictionary:key];
@@ -218,9 +218,9 @@ static PlainKey *s_sharedPlainKey = nil;
                            [[PublicKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_ECC]);
 
     // private key
-    MKMPrivateKeySetFactory(MKMAlgorithm_RSA,
+    MKPrivateKeySetFactory(MKMAlgorithm_RSA,
                             [[PrivateKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_RSA]);
-    MKMPrivateKeySetFactory(MKMAlgorithm_ECC,
+    MKPrivateKeySetFactory(MKMAlgorithm_ECC,
                             [[PrivateKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_ECC]);
 }
 
@@ -239,9 +239,9 @@ static PlainKey *s_sharedPlainKey = nil;
     
     // TED
     DIMBase64DataFactory *b64Factory = [[DIMBase64DataFactory alloc] init];
-    MKMTransportableDataSetFactory(MKMAlgorithm_Base64, b64Factory);
-    //MKMTransportableDataSetFactory(MKMAlgorithm_TransportableDefault, b64Factory);
-    MKMTransportableDataSetFactory(@"*", b64Factory);
+    MKTransportableDataSetFactory(MKMAlgorithm_Base64, b64Factory);
+    //MKTransportableDataSetFactory(MKMAlgorithm_TransportableDefault, b64Factory);
+    MKTransportableDataSetFactory(@"*", b64Factory);
 }
 
 @end

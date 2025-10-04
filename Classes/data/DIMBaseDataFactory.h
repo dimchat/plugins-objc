@@ -39,7 +39,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DIMBase64DataFactory : NSObject <MKMTransportableDataFactory>
+@interface DIMBase64DataFactory : NSObject <MKTransportableDataFactory>
 
 @end
 

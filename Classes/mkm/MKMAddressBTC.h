@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  *          code        = sha256(sha256(network + digest)).prefix(4);
  *          address     = base58_encode(network + digest + code);
  */
-@interface MKMAddressBTC : MKMString <MKMAddress>
+@interface MKMAddressBTC : MKString <MKMAddress>
 
 - (instancetype)initWithString:(NSString *)address type:(MKMEntityType)network
 NS_DESIGNATED_INITIALIZER;

@@ -136,7 +136,7 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
         name = @"EC";
     }
     NSString *base64 = KeyContentFromPEM(pem, name, @"PUBLIC");
-    return MKMBase64Decode(base64);
+    return MKBase64Decode(base64);
 }
 
 + (SecKeyRef)publicKeyFromData:(NSData *)data algorithm:(NSString *)name {
@@ -157,7 +157,7 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
         name = @"EC";
     }
     NSString *base64 = KeyContentFromPEM(pem, name, @"PRIVATE");
-    return MKMBase64Decode(base64);
+    return MKBase64Decode(base64);
 }
 
 + (SecKeyRef)privateKeyFromData:(NSData *)data algorithm:(NSString *)name {

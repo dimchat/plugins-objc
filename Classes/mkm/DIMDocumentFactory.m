@@ -62,7 +62,7 @@ static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
 
 - (id<MKMDocument>)createDocument:(id<MKMID>)ID
                              data:(nullable NSString *)json
-                        signature:(nullable id<MKMTransportableData>)CT {
+                        signature:(nullable id<MKTransportableData>)CT {
     NSString *type = doc_type(_type, ID);
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {

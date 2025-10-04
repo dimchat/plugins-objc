@@ -58,10 +58,10 @@
 }
 
 /* designated initializer */
-- (instancetype)initWithType:(MKMMetaType)version
-                         key:(id<MKMVerifyKey>)publicKey
+- (instancetype)initWithType:(NSString *)version
+                         key:(id<MKVerifyKey>)publicKey
                         seed:(NSString *)seed
-                 fingerprint:(id<MKMTransportableData>)CT {
+                 fingerprint:(id<MKTransportableData>)CT {
     if (self = [super initWithType:version
                                key:publicKey
                               seed:seed
@@ -72,7 +72,7 @@
 }
 
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
-    NSAssert(self.type == MKMMetaType_MKM, @"meta version error: %d", self.type);
+    NSAssert(self.type == MKMMetaType_MKM, @"meta version error: %@", self.type);
     // check caches
     MKMAddressBTC *address = [_cachedAddresses objectForKey:@(network)];
     if (!address) {

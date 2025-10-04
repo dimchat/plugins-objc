@@ -275,7 +275,7 @@
     return signature;
 }
 
-- (BOOL)matchEncryptKey:(id<MKMEncryptKey>)pKey {
+- (BOOL)matchEncryptKey:(id<MKEncryptKey>)pKey {
     return DIMCryptoMatchEncryptKey(pKey, self);
 }
 

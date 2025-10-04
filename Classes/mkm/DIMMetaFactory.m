@@ -43,16 +43,16 @@
 
 @implementation DIMMetaFactory
 
-- (instancetype)initWithType:(MKMMetaType)version {
+- (instancetype)initWithType:(NSString *)version {
     if (self = [super init]) {
         _type = version;
     }
     return self;
 }
 
-- (id<MKMMeta>)createMetaWithKey:(id<MKMVerifyKey>)PK
+- (id<MKMMeta>)createMetaWithKey:(id<MKVerifyKey>)PK
                             seed:(nullable NSString *)name
-                     fingerprint:(nullable id<MKMTransportableData>)CT {
+                     fingerprint:(nullable id<MKTransportableData>)CT {
     id<MKMMeta> meta;
     switch (_type) {
         case MKMMetaType_MKM:
@@ -79,21 +79,21 @@
 
 - (id<MKMMeta>)generateMetaWithKey:(id<MKMSignKey>)SK
                               seed:(nullable NSString *)name {
-    id<MKMTransportableData> CT;
+    id<MKTransportableData> CT;
     if (name.length > 0) {
         NSData *sig = [SK sign:MKMUTF8Encode(name)];
-        CT = MKMTransportableDataCreate(sig, nil);
+        CT = MKTransportableDataCreate(sig, nil);
     } else {
         CT = nil;
     }
-    id<MKMPublicKey> PK = [(id<MKMPrivateKey>)SK publicKey];
+    id<MKMPublicKey> PK = [(id<MKPrivateKey>)SK publicKey];
     return [self createMetaWithKey:PK seed:name fingerprint:CT];
 }
 
 - (nullable id<MKMMeta>)parseMeta:(NSDictionary *)info {
     id<MKMMeta> meta = nil;
     MKMFactoryManager *man = [MKMFactoryManager sharedManager];
-    MKMMetaType version = [man.generalFactory metaType:info
+    NSString *version = [man.generalFactory metaType:info
                                           defaultValue:0];
     switch (version) {
         case MKMMetaType_MKM:

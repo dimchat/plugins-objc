@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
  *          data         : "..." // base64_encode()
  *      }
  */
-@interface MKMRSAPrivateKey : DIMPrivateKey <MKMDecryptKey>
+@interface MKMRSAPrivateKey : DIMPrivateKey <MKDecryptKey>
 
 @end
 

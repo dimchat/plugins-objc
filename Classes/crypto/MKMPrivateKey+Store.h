@@ -44,9 +44,9 @@ extern "C"
 {
 #endif
 
-id<MKMPrivateKey> MKMPrivateKeyLoad(NSString * identifier);
+id<MKPrivateKey> MKPrivateKeyLoad(NSString * identifier);
 
-BOOL MKMPrivateKeySave(NSString * identifier, id<MKMPrivateKey> sKey);
+BOOL MKPrivateKeySave(NSString * identifier, id<MKPrivateKey> sKey);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

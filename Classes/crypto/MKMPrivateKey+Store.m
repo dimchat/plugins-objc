@@ -40,7 +40,7 @@
 
 #import "MKMPrivateKey+Store.h"
 
-id<MKMPrivateKey> MKMPrivateKeyLoad(NSString * identifier) {
+id<MKPrivateKey> MKPrivateKeyLoad(NSString * identifier) {
     id key = [MKMRSAPrivateKey loadKeyWithIdentifier:identifier];
     if (key) {
         return key;
@@ -52,7 +52,7 @@ id<MKMPrivateKey> MKMPrivateKeyLoad(NSString * identifier) {
     return nil;
 }
 
-BOOL MKMPrivateKeySave(NSString * identifier, id<MKMPrivateKey> sKey) {
+BOOL MKPrivateKeySave(NSString * identifier, id<MKPrivateKey> sKey) {
     if ([sKey isKindOfClass:[MKMRSAPrivateKey class]]) {
         return [(MKMRSAPrivateKey *)sKey saveKeyWithIdentifier:identifier];
     }
