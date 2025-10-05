@@ -85,7 +85,7 @@
     return address;
 }
 
-- (MKMEntityType)type {
+- (MKMEntityType)network {
     return _network;
 }
 
@@ -115,7 +115,7 @@ static inline NSData *check_code(NSData *data) {
 
 + (instancetype)generate:(NSData *)fingerprint type:(MKMEntityType)network {
     // 1. digest = ripemd160(sha256(fingerprint))
-    NSData *digest = MKMRIPEMD160Digest(MKSHA256Digest(fingerprint));
+    NSData *digest = MKRipeMD160Digest(MKSHA256Digest(fingerprint));
     // 2. head = network + digest
     NSMutableData *data = [[NSMutableData alloc] initWithBytes:&network length:1];
     [data appendData:digest];
@@ -123,7 +123,7 @@ static inline NSData *check_code(NSData *data) {
     NSData *cc = check_code(data);
     // 4. addr = base58_encode(_h + cc)
     [data appendData:cc];
-    NSString *string = MKMBase58Encode(data);
+    NSString *string = MKBase58Encode(data);
     return [[self alloc] initWithString:string type:network];
 }
 
@@ -132,7 +132,7 @@ static inline NSData *check_code(NSData *data) {
         return nil;
     }
     // decode
-    NSData *data = MKMBase58Decode(string);
+    NSData *data = MKBase58Decode(string);
     if (data.length != 25) {
         return nil;
     }

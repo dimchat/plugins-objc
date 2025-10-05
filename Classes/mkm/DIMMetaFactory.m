@@ -54,30 +54,21 @@
                             seed:(nullable NSString *)name
                      fingerprint:(nullable id<MKTransportableData>)CT {
     id<MKMMeta> meta;
-    switch (_type) {
-        case MKMMetaType_MKM:
-            meta = [[MKMMetaDefault alloc] initWithType:_type key:PK seed:name fingerprint:CT];
-            break;
-            
-        case MKMMetaType_BTC:
-        case MKMMetaType_ExBTC:
-            meta = [[MKMMetaBTC alloc] initWithType:_type key:PK seed:name fingerprint:CT];
-            break;
-                
-        case MKMMetaType_ETH:
-        case MKMMetaType_ExETH:
-            meta = [[MKMMetaETH alloc] initWithType:_type key:PK seed:name fingerprint:CT];
-            break;
-
-        default:
-            NSAssert(false, @"meta type not supported: %d", _type);
-            meta = nil;
-            break;
+    NSString *version = _type;
+    if ([version isEqualToString:MKMMetaType_MKM]) {
+        meta = [[MKMMetaDefault alloc] initWithType:version key:PK seed:name fingerprint:CT];
+    } else if ([version isEqualToString:MKMMetaType_BTC]) {
+        meta = [[MKMMetaBTC alloc] initWithType:version key:PK seed:name fingerprint:CT];
+    } else if ([version isEqualToString:MKMMetaType_ETH]) {
+        meta = [[MKMMetaETH alloc] initWithType:version key:PK seed:name fingerprint:CT];
+    } else {
+        NSAssert(false, @"meta type not supported: %@", version);
+        meta = nil;
     }
     return meta;
 }
 
-- (id<MKMMeta>)generateMetaWithKey:(id<MKMSignKey>)SK
+- (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK
                               seed:(nullable NSString *)name {
     id<MKTransportableData> CT;
     if (name.length > 0) {
@@ -86,33 +77,23 @@
     } else {
         CT = nil;
     }
-    id<MKMPublicKey> PK = [(id<MKPrivateKey>)SK publicKey];
+    id<MKPublicKey> PK = [(id<MKPrivateKey>)SK publicKey];
     return [self createMetaWithKey:PK seed:name fingerprint:CT];
 }
 
 - (nullable id<MKMMeta>)parseMeta:(NSDictionary *)info {
     id<MKMMeta> meta = nil;
-    MKMFactoryManager *man = [MKMFactoryManager sharedManager];
-    NSString *version = [man.generalFactory metaType:info
-                                          defaultValue:0];
-    switch (version) {
-        case MKMMetaType_MKM:
-            meta = [[MKMMetaDefault alloc] initWithDictionary:info];
-            break;
-            
-        case MKMMetaType_BTC:
-        case MKMMetaType_ExBTC:
-            meta = [[MKMMetaBTC alloc] initWithDictionary:info];
-            break;
-            
-        case MKMMetaType_ETH:
-        case MKMMetaType_ExETH:
-            meta = [[MKMMetaETH alloc] initWithDictionary:info];
-            break;
-            
-        default:
-            NSAssert(false, @"meta type not supported: %d", version);
-            break;
+    MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
+    NSString *version = [ext.helper getMetaType:info defaultValue:nil];
+    if ([version isEqualToString:MKMMetaType_MKM]) {
+        meta = [[MKMMetaDefault alloc] initWithDictionary:info];
+    } else if ([version isEqualToString:MKMMetaType_BTC]) {
+        meta = [[MKMMetaBTC alloc] initWithDictionary:info];
+    } else if ([version isEqualToString:MKMMetaType_ETH]) {
+        meta = [[MKMMetaETH alloc] initWithDictionary:info];
+    } else {
+        NSAssert(false, @"meta type not supported: %@", version);
+        meta = nil;
     }
     return [meta isValid] ? meta : nil;
 }

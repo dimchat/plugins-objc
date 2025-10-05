@@ -75,12 +75,12 @@ static inline NSString *concat(NSString *name,
     return self;
 }
 
-- (id<MKMID>)generateIdentifierWithMeta:(id<MKMMeta>)meta
-                                   type:(MKMEntityType)network
-                               terminal:(nullable NSString *)location {
+- (id<MKMID>)generateIdentifier:(MKMEntityType)network
+                       withMeta:(id<MKMMeta>)meta
+                       terminal:(nullable NSString *)locater {
     id<MKMAddress> address = MKMAddressGenerate(network, meta);
     NSAssert(address, @"failed to generate address with meta: %@", meta);
-    return MKMIDCreate(meta.seed, address, location);
+    return MKMIDCreate(meta.seed, address, locater);
 }
 
 - (id<MKMID>)createIdentifierWithName:(NSString *)name
@@ -161,7 +161,7 @@ static inline NSString *concat(NSString *name,
 
 - (NSUInteger)reduceMemory {
     NSUInteger snap = 0;
-    snap = DIMThanos(_identifiers, snap);
+//    snap = DIMThanos(_identifiers, snap);
     return snap;
 }
 

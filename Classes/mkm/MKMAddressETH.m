@@ -87,7 +87,7 @@ static inline BOOL is_eth(NSString *address) {
 
 @implementation MKMAddressETH
 
-- (MKMEntityType)type {
+- (MKMEntityType)network {
     return MKMEntityType_User;
 }
 

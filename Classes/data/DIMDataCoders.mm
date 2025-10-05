@@ -39,7 +39,7 @@
 
 #import "DIMDataCoders.h"
 
-@interface Hex : NSObject <MKMDataCoder>
+@interface Hex : NSObject <MKDataCoder>
 
 @end
 
@@ -108,7 +108,7 @@ static inline char hex_char(char ch) {
 
 @end
 
-@interface Base58 : NSObject <MKMDataCoder>
+@interface Base58 : NSObject <MKDataCoder>
 
 @end
 
@@ -136,7 +136,7 @@ static inline char hex_char(char ch) {
 
 @end
 
-@interface Base64 : NSObject <MKMDataCoder>
+@interface Base64 : NSObject <MKDataCoder>
 
 @end
 
@@ -159,14 +159,14 @@ static inline char hex_char(char ch) {
 void DIMRegisterDataCoders(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if ([MKMHex getCoder] == nil) {
-            [MKMHex setCoder:[[Hex alloc] init]];
+        if ([MKHex getCoder] == nil) {
+            [MKHex setCoder:[[Hex alloc] init]];
         }
-        if ([MKMBase58 getCoder] == nil) {
-            [MKMBase58 setCoder:[[Base58 alloc] init]];
+        if ([MKBase58 getCoder] == nil) {
+            [MKBase58 setCoder:[[Base58 alloc] init]];
         }
-        if ([MKMBase64 getCoder] == nil) {
-            [MKMBase64 setCoder:[[Base64 alloc] init]];
+        if ([MKBase64 getCoder] == nil) {
+            [MKBase64 setCoder:[[Base64 alloc] init]];
         }
     });
 }

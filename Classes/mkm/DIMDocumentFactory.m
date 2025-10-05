@@ -90,8 +90,8 @@ static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
         NSAssert(false, @"document ID not found: %@", doc);
         return nil;
     }
-    MKMFactoryManager *man = [MKMFactoryManager sharedManager];
-    NSString *type = [man.generalFactory documentType:doc defaultValue:nil];
+    MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
+    NSString *type = [ext.helper getDocumentType:doc defaultValue:nil];
     if (!type) {
         type = doc_type(@"*", ID);
     }

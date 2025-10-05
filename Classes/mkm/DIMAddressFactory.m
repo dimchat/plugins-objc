@@ -58,8 +58,8 @@
     return self;
 }
 
-- (id<MKMAddress>)generateAddressWithMeta:(id<MKMMeta>)meta
-                                     type:(MKMEntityType)network {
+- (id<MKMAddress>)generateAddress:(MKMEntityType)network
+                         withMeta:(id<MKMMeta>)meta {
     id<MKMAddress> address = [meta generateAddress:network];
     NSAssert(address, @"failed to generate address: %@", meta);
     [_addresses setObject:address forKey:address.string];
@@ -69,7 +69,7 @@
 - (nullable id<MKMAddress>)parseAddress:(NSString *)address {
     id<MKMAddress> addr = [_addresses objectForKey:address];
     if (!addr) {
-        addr = MKMAddressCreate(address);
+        addr = [self createAddress:address];
         if (addr) {
             [_addresses setObject:addr forKey:address];
         }
@@ -88,7 +88,7 @@
 
 - (NSUInteger)reduceMemory {
     NSUInteger snap = 0;
-    snap = DIMThanos(_addresses, snap);
+//    snap = DIMThanos(_addresses, snap);
     return snap;
 }
 

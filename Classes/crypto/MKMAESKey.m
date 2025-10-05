@@ -198,11 +198,11 @@ static inline NSData *random_data(NSUInteger size) {
 
 #pragma mark - Protocol
 
-- (NSData *)encrypt:(NSData *)plaintext params:(nullable NSMutableDictionary<NSString *,id> *)extra {
+- (NSData *)encrypt:(NSData *)plaintext extra:(nullable NSMutableDictionary<NSString *,id> *)params {
     NSAssert(self.keySize == kCCKeySizeAES256, @"only support AES-256 now");
     // 0. TODO: random new 'IV'
     NSString *base64 = [self _ivString];
-    [extra setObject:base64 forKey:@"IV"];
+    [params setObject:base64 forKey:@"IV"];
     // 1. get key data & initial vector
     NSData *key = [self data];
     NSData *iv = [self iv];
