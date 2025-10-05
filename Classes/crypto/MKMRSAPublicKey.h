@@ -42,12 +42,16 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  *  RSA Public Key
  *
- *      keyInfo format: {
- *          algorithm: "RSA",
- *          data: "..."       // base64
+ *      keyInfo format : {
+ *          algorithm  : "RSA",
+ *          data       : "..." // base64_encode()
  *      }
  */
-@interface MKMRSAPublicKey : DIMPublicKey <MKEncryptKey>
+@interface DIMRSAPublicKey : DIMPublicKey <MKEncryptKey>
+
+@end
+
+@interface DIMRSAPublicKeyFactory : NSObject <MKPublicKeyFactory>
 
 @end
 

@@ -42,21 +42,25 @@ NS_ASSUME_NONNULL_BEGIN
 /*
 *  ECC Private Key
 *
-*      keyInfo format: {
-*          algorithm    : "ECC",
-*          keySizeInBits: 256,  // optional
-*          data         : "..." // base64_encode()
+*      keyInfo format : {
+*          algorithm  : "ECC",
+*          curve      : "secp256k1",
+*          data       : "..." // base64_encode()
 *      }
 */
-@interface MKMECCPrivateKey : DIMPrivateKey
+@interface DIMECCPrivateKey : DIMPrivateKey
 
 @end
 
-@interface MKMECCPrivateKey (PersistentStore)
+@interface DIMECCPrivateKey (PersistentStore)
 
 + (nullable instancetype)loadKeyWithIdentifier:(NSString *)identifier;
 
 - (BOOL)saveKeyWithIdentifier:(NSString *)identifier;
+
+@end
+
+@interface DIMECCPrivateKeyFactory : NSObject <MKPrivateKeyFactory>
 
 @end
 

@@ -40,39 +40,29 @@
 
 #import "MKMRSAPrivateKey.h"
 
-@interface MKMRSAPrivateKey () {
-    
-    NSData *_data;
-    
-    NSUInteger _keySize;
+@interface DIMRSAPrivateKey () {
     
     SecKeyRef _privateKeyRef;
     
-    MKMRSAPublicKey *_publicKey;
+    id<MKPublicKey> _publicKey;
 }
 
-@property (strong, nonatomic) NSData *data;
+@property (readonly, nonatomic) NSUInteger keySize;
 
-@property (nonatomic) NSUInteger keySize;
+@property (strong, nonatomic, nullable) NSData *keyData;
 
 @property (nonatomic) SecKeyRef privateKeyRef;
 
-@property (strong, nonatomic, nullable) MKMRSAPublicKey *publicKey;
-
 @end
 
-@implementation MKMRSAPrivateKey
+@implementation DIMRSAPrivateKey
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)keyInfo {
     if (self = [super initWithDictionary:keyInfo]) {
-        // lazy
-        _data = nil;
-        
-        _keySize = 0;
-        
+        // lazy load
+        _keyData = nil;
         _privateKeyRef = NULL;
-        
         _publicKey = nil;
     }
     
@@ -88,45 +78,35 @@
 }
 
 - (id)copyWithZone:(nullable NSZone *)zone {
-    MKMRSAPrivateKey *key = [super copyWithZone:zone];
+    DIMRSAPrivateKey *key = [super copyWithZone:zone];
     if (key) {
-        key.data = _data;
-        key.keySize = _keySize;
+        key.keyData = _keyData;
         key.privateKeyRef = _privateKeyRef;
         key.publicKey = _publicKey;
     }
     return key;
 }
 
-- (void)setData:(NSData *)data {
-    _data = data;
-}
-
-- (NSData *)data {
-    if (!_data) {
-        NSString *pem = [self objectForKey:@"data"];
-        _data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_RSA];
-    }
-    return _data;
-}
-
 - (NSUInteger)keySize {
-    if (_keySize == 0) {
-        // get from key
-        if (_privateKeyRef || [self objectForKey:@"data"]) {
-            size_t bytes = SecKeyGetBlockSize(self.privateKeyRef);
-            _keySize = bytes * sizeof(uint8_t);
-        } else {
-            // get from dictionary
-            NSNumber *size = [self objectForKey:@"keySize"];
-            if (size == nil) {
-                _keySize = 1024 / 8; // 128
-            } else {
-                _keySize = size.unsignedIntegerValue;
-            }
-        }
+    // get from key data
+    if (_privateKeyRef || [self objectForKey:@"data"]) {
+        size_t bytes = SecKeyGetBlockSize(self.privateKeyRef);
+        return bytes * sizeof(uint8_t);
     }
-    return _keySize;
+    return [self unsignedIntegerForKey:@"keySize"
+                          defaultValue:1024 / 8]; // 128
+}
+
+// Override
+- (NSData *)data {
+    NSData *bin = _keyData;
+    if (!bin) {
+        NSString *pem = [self objectForKey:@"data"];
+        bin = [MKMSecKeyHelper privateKeyDataFromContent:pem
+                                               algorithm:MKAsymmetricAlgorithm_RSA];
+        _keyData = bin;
+    }
+    return bin;
 }
 
 - (void)setPrivateKeyRef:(SecKeyRef)privateKeyRef {
@@ -188,7 +168,7 @@
     return _privateKeyRef;
 }
 
-- (MKMRSAPublicKey *)publicKey {
+- (id<MKPublicKey>)publicKey {
     if (!_publicKey) {
         // get public key content from private key
         SecKeyRef publicKeyRef = SecKeyCopyPublicKey(self.privateKeyRef);
@@ -199,12 +179,12 @@
                                @"padding"  :@"PKCS1",
                                @"digest"   :@"SHA256",
                                };
-        _publicKey = [[MKMRSAPublicKey alloc] initWithDictionary:dict];
+        _publicKey = [[DIMRSAPublicKey alloc] initWithDictionary:dict];
     }
     return _publicKey;
 }
 
-- (void)setPublicKey:(nullable MKMRSAPublicKey *)publicKey {
+- (void)setPublicKey:(nullable id<MKPublicKey>)publicKey {
     _publicKey = publicKey;
 }
 

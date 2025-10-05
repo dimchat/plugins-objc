@@ -42,21 +42,24 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  *  RSA Private Key
  *
- *      keyInfo format: {
- *          algorithm    : "RSA",
- *          keySizeInBits: 1024, // optional
- *          data         : "..." // base64_encode()
+ *      keyInfo format : {
+ *          algorithm  : "RSA",
+ *          data       : "..." // base64_encode()
  *      }
  */
-@interface MKMRSAPrivateKey : DIMPrivateKey <MKDecryptKey>
+@interface DIMRSAPrivateKey : DIMPrivateKey <MKDecryptKey>
 
 @end
 
-@interface MKMRSAPrivateKey (PersistentStore)
+@interface DIMRSAPrivateKey (PersistentStore)
 
 + (nullable instancetype)loadKeyWithIdentifier:(NSString *)identifier;
 
 - (BOOL)saveKeyWithIdentifier:(NSString *)identifier;
+
+@end
+
+@interface DIMRSAPrivateKeyFactory : NSObject <MKPrivateKeyFactory>
 
 @end
 

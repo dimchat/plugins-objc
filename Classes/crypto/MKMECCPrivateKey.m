@@ -110,80 +110,73 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
 
 #import "MKMECCPrivateKey.h"
 
-@interface MKMECCPrivateKey () {
+@interface DIMECCPrivateKey () {
     
-    NSData *_data;
-    
-    NSUInteger _keySize;
-    
-    const uint8_t *_prikey;
-    
-    MKMECCPublicKey *_publicKey;
+    id<MKPublicKey> _pubKey;
 }
 
-@property (strong, nonatomic) NSData *data;
+@property (readonly, nonatomic) NSUInteger keySize;
 
-@property (nonatomic) NSUInteger keySize;
-
-@property (nonatomic) const uint8_t *prikey;
-
-@property (strong, nonatomic, nullable) MKMECCPublicKey *publicKey;
+@property (strong, nonatomic, nullable) NSData *keyData;
 
 @end
 
-@implementation MKMECCPrivateKey
+@implementation DIMECCPrivateKey
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)keyInfo {
     if (self = [super initWithDictionary:keyInfo]) {
-        // lazy
-        _data = nil;
-        
-        _keySize = 0;
-        
-        _prikey = NULL;
-        
-        _publicKey = nil;
+        // lazy load
+        _keyData = nil;
+        _pubKey = nil;
     }
     
     return self;
 }
 
-- (void)dealloc {
-    
-    // clear prikey
-    self.prikey = NULL;
-
-    //[super dealloc];
-}
-
 - (id)copyWithZone:(nullable NSZone *)zone {
-    MKMECCPrivateKey *key = [super copyWithZone:zone];
+    DIMECCPrivateKey *key = [super copyWithZone:zone];
     if (key) {
-        key.data = _data;
-        key.keySize = _keySize;
-        key.prikey = _prikey;
-        key.publicKey = _publicKey;
+        key.keyData = _keyData;
+        key.publicKey = _pubKey;
     }
     return key;
 }
 
+// protected
+- (NSUInteger)keySize {
+    // TODO: get from key data
+    return [self unsignedIntegerForKey:@"keySize"
+                          defaultValue:256 / 8]; // 32
+}
+
+// protected
 - (uECC_Curve)curve {
     // TODO: other curve?
     return uECC_secp256k1();
 }
 
+// private
+- (const uint8_t *)prikey {
+    NSData *data = self.data;
+    const uint8_t *ptr = [data bytes];
+    return ptr;
+}
+
+// Override
 - (NSData *)data {
-    if (!_data) {
+    NSData *bin = _keyData;
+    if (!bin) {
         NSString *pem = [self objectForKey:@"data"];
         // check for raw data (32 bytes)
         NSUInteger len = pem.length;
         if (len == 64) {
             // Hex encode
-            _data = MKHexDecode(pem);
+            bin = MKHexDecode(pem);
         } else if (len > 0) {
             // PEM
-            _data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_ECC];
+            bin = [MKMSecKeyHelper privateKeyDataFromContent:pem
+                                                   algorithm:MKAsymmetricAlgorithm_ECC];
         } else {
             // generate it
             // TODO: check key size?
@@ -194,38 +187,22 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
                 NSAssert(false, @"failed to generate ECC private key");
                 return nil;
             }
-            _data = [[NSData alloc] initWithBytes:prikey length:32];
-            [self setObject:MKHexEncode(_data) forKey:@"data"];
+            bin = [[NSData alloc] initWithBytes:prikey length:32];
+            [self setObject:MKHexEncode(bin) forKey:@"data"];
         }
+        _keyData = bin;
     }
-    return _data;
-}
-- (void)setData:(NSData *)data {
-    _data = data;
+    return bin;
 }
 
-- (NSUInteger)keySize {
-    if (_keySize == 0) {
-        NSNumber *size = [self objectForKey:@"keySize"];
-        if (size == nil) {
-            _keySize = 256 / 8; // 32
-        } else {
-            _keySize = size.unsignedIntegerValue;
-        }
-    }
-    return _keySize;
+// protected
+- (void)setPublicKey:(nullable DIMECCPublicKey *)pKey {
+    _pubKey = pKey;
 }
 
-- (const uint8_t *)prikey {
-    if (_prikey == NULL) {
-        NSData *data = self.data;
-        _prikey = data.bytes;
-    }
-    return _prikey;
-}
-
-- (MKMECCPublicKey *)publicKey {
-    if (!_publicKey) {
+// Override
+- (id<MKPublicKey>)publicKey {
+    if (!_pubKey) {
         // get public key content from private key
         uint8_t pubkey[65] = {0};
         pubkey[0] = 0x04;
@@ -238,20 +215,17 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
         
         NSData *data = [[NSData alloc] initWithBytes:pubkey length:len];
         NSString *hex = MKHexEncode(data);
-        NSDictionary *dict = @{@"algorithm":MKAsymmetricAlgorithm_ECC,
-                               @"data"     :hex,
-                               @"curve"    :@"secp256k1",
-                               @"digest"   :@"SHA256",
-                               };
-        _publicKey = [[MKMECCPublicKey alloc] initWithDictionary:dict];
+        _pubKey = [[DIMECCPublicKey alloc] initWithDictionary:@{
+            @"algorithm" : MKAsymmetricAlgorithm_ECC,
+            @"data"      : hex,
+            @"curve"     : @"secp256k1",
+            @"digest"    : @"SHA256",
+        }];
     }
-    return _publicKey;
+    return _pubKey;
 }
 
-- (void)setPublicKey:(nullable MKMECCPublicKey *)publicKey {
-    _publicKey = publicKey;
-}
-
+// Override
 - (NSData *)sign:(NSData *)data {
     NSData *hash = MKSHA256Digest(data);
     uint8_t sig[64];

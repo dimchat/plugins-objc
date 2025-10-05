@@ -135,127 +135,89 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
     return 0;
 }
 
-@interface MKMECCPublicKey () {
-    
-    NSData *_data;
-    
-    NSUInteger _keySize;
-    
-    const uint8_t *_pubkey;
-}
+@interface DIMECCPublicKey ()
 
-@property (strong, nonatomic) NSData *data;
+@property (readonly, nonatomic) NSUInteger keySize;
 
-@property (nonatomic) NSUInteger keySize;
-
-@property (nonatomic) const uint8_t *pubkey;
+@property (strong, nonatomic, nullable) NSData *keyData;
 
 @end
 
-@implementation MKMECCPublicKey
+@implementation DIMECCPublicKey
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)keyInfo {
     if (self = [super initWithDictionary:keyInfo]) {
-        // lazy
-        _data = nil;
-        
-        _keySize = 0;
-        
-        _pubkey = NULL;
+        // lazy load
+        _keyData = nil;
     }
     
     return self;
 }
 
-- (void)dealloc {
-    
-    // clear pubkey
-    self.pubkey = NULL;
-    
-    //[super dealloc];
-}
-
 - (id)copyWithZone:(nullable NSZone *)zone {
-    MKMECCPublicKey *key = [super copyWithZone:zone];
+    DIMECCPublicKey *key = [super copyWithZone:zone];
     if (key) {
-        key.data = _data;
-        key.keySize = _keySize;
-        key.pubkey = _pubkey;
+        key.keyData = _keyData;
     }
     return key;
 }
 
+// protected
+- (NSUInteger)keySize {
+    // TODO: get from key data
+    return [self unsignedIntegerForKey:@"keySize"
+                          defaultValue:256 / 8]; // 32
+}
+
+// protected
 - (uECC_Curve)curve {
     // TODO: other curve?
     return uECC_secp256k1();
 }
 
+// private
 - (const uint8_t *)pubkey {
-    if (_pubkey == NULL) {
-        NSData *data = self.data;
-        _pubkey = data.bytes;
-        // TODO: check for compressed key
-        if (data.length == 65) {
-            _pubkey = _pubkey+1;
-        }
+    NSData *data = self.data;
+    const uint8_t *ptr = [data bytes];
+    // TODO: check for compressed key
+    if (data.length == 65) {
+        ptr = ptr+1;
     }
-    return _pubkey;
-}
-- (void)setPubkey:(const uint8_t *)pubkey {
-    if (_pubkey != pubkey) {
-        if (_pubkey != NULL) {
-            //free(_pubkey);
-            _pubkey = NULL;
-        }
-        if (pubkey != NULL) {
-            _pubkey = pubkey;
-        }
-    }
+    return ptr;
 }
 
+// Override
 - (NSData *)data {
-    if (!_data) {
+    NSData *bin = _keyData;
+    if (!bin) {
         NSString *pem = [self objectForKey:@"data"];
         // check for raw data (33/65 bytes)
         NSUInteger len = pem.length;
         if (len == 66 || len == 130) {
             // Hex encode
-            _data = MKHexDecode(pem);
+            bin = MKHexDecode(pem);
         } else if (len > 0) {
             // PEM
-            _data = [MKMSecKeyHelper publicKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_ECC];
-            
-            if (_data.length > 65) {
+            bin = [MKMSecKeyHelper publicKeyDataFromContent:pem
+                                                  algorithm:MKAsymmetricAlgorithm_ECC];
+            if (bin.length > 65) {
                 // FIXME: X.509 -> Uncompressed Point
-                NSAssert(_data.length == 88, @"unexpected ECC public key: %@", self);
-                unsigned char *bytes = (unsigned char *)_data.bytes;
+                NSAssert(bin.length == 88, @"unexpected ECC public key: %@", self);
+                unsigned char *bytes = (unsigned char *)bin.bytes;
                 if (bytes[88 - 65] == 0x04) {
-                    _data = [_data subdataWithRange:NSMakeRange(88 - 65, 65)];
+                    bin = [bin subdataWithRange:NSMakeRange(88 - 65, 65)];
                 } else {
                     //@throw [NSException exceptionWithName:@"ECCKeyError" reason:@"not support" userInfo:self.dictionary];
                 }
             }
         }
+        _keyData = bin;
     }
-    return _data;
-}
-- (void)setData:(NSData *)data {
-    _data = data;
+    return bin;
 }
 
-- (NSUInteger)keySize {
-    if (_keySize == 0) {
-        NSNumber *size = [self objectForKey:@"keySize"];
-        if (size == nil) {
-            _keySize = 256 / 8; // 32
-        } else {
-            _keySize = size.unsignedIntegerValue;
-        }
-    }
-    return _keySize;
-}
-
+// Override
 - (BOOL)verify:(NSData *)data withSignature:(NSData *)signature {
     NSData *hash = MKSHA256Digest(data);
     uint8_t sig[64];
@@ -271,6 +233,21 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
     } @finally {
         //
     }
+}
+
+@end
+
+@implementation DIMECCPublicKeyFactory
+
+// Override
+- (nullable id<MKPublicKey>)parsePublicKey:(NSDictionary *)key {
+    // check 'data'
+    if ([key objectForKey:@"data"] == nil) {
+        // key.data should not be empty
+        NSAssert(false, @"ECC key error: %@", key);
+        return nil;
+    }
+    return [[DIMECCPublicKey alloc] initWithDictionary:key];
 }
 
 @end

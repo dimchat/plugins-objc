@@ -45,11 +45,14 @@ NS_ASSUME_NONNULL_BEGIN
  *      keyInfo format: {
  *          algorithm: "AES",
  *          keySize  : 32,                // optional
- *          data     : "{BASE64_ENCODE}", // password data
- *          iv       : "{BASE64_ENCODE}", // initialization vector
+ *          data     : "{BASE64_ENCODE}", // key data
  *      }
  */
-@interface MKMAESKey : DIMSymmetricKey
+@interface DIMAESKey : DIMSymmetricKey
+
+@end
+
+@interface DIMAESKeyFactory : NSObject <MKSymmetricKeyFactory>
 
 @end
 

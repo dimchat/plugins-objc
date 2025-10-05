@@ -39,18 +39,18 @@
 
 #import "MKMRSAPrivateKey.h"
 
-@interface MKMRSAPrivateKey (Hacking)
+@interface DIMRSAPrivateKey (Hacking)
 
 @property (nonatomic) SecKeyRef privateKeyRef;
 
 @end
 
-@implementation MKMRSAPrivateKey (PersistentStore)
+@implementation DIMRSAPrivateKey (PersistentStore)
 
 static NSString *s_application_tag = @"chat.dim.rsa.private";
 
 + (nullable instancetype)loadKeyWithIdentifier:(NSString *)identifier {
-    MKMRSAPrivateKey *SK = nil;
+    DIMRSAPrivateKey *SK = nil;
     
     NSString *label = identifier;
     NSData *tag = MKUTF8Encode(s_application_tag);
@@ -84,7 +84,7 @@ static NSString *s_application_tag = @"chat.dim.rsa.private";
         NSDictionary *keyInfo = @{@"algorithm":algorithm,
                                   @"data"     :content,
                                   };
-        SK = [[MKMRSAPrivateKey alloc] initWithDictionary:keyInfo];
+        SK = [[DIMRSAPrivateKey alloc] initWithDictionary:keyInfo];
     } else {
         // sec key item not found
         NSAssert(status == errSecItemNotFound, @"RSA item status error: %d", status);

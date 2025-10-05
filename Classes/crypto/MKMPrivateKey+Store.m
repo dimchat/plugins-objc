@@ -41,11 +41,11 @@
 #import "MKMPrivateKey+Store.h"
 
 id<MKPrivateKey> MKPrivateKeyLoad(NSString * identifier) {
-    id key = [MKMRSAPrivateKey loadKeyWithIdentifier:identifier];
+    id key = [DIMRSAPrivateKey loadKeyWithIdentifier:identifier];
     if (key) {
         return key;
     }
-    key = [MKMECCPrivateKey loadKeyWithIdentifier:identifier];
+    key = [DIMECCPrivateKey loadKeyWithIdentifier:identifier];
     if (key) {
         return key;
     }
@@ -53,11 +53,11 @@ id<MKPrivateKey> MKPrivateKeyLoad(NSString * identifier) {
 }
 
 BOOL MKPrivateKeySave(NSString * identifier, id<MKPrivateKey> sKey) {
-    if ([sKey isKindOfClass:[MKMRSAPrivateKey class]]) {
-        return [(MKMRSAPrivateKey *)sKey saveKeyWithIdentifier:identifier];
+    if ([sKey isKindOfClass:[DIMRSAPrivateKey class]]) {
+        return [(DIMRSAPrivateKey *)sKey saveKeyWithIdentifier:identifier];
     }
-    if ([sKey isKindOfClass:[MKMECCPrivateKey class]]) {
-        return [(MKMECCPrivateKey *)sKey saveKeyWithIdentifier:identifier];
+    if ([sKey isKindOfClass:[DIMECCPrivateKey class]]) {
+        return [(DIMECCPrivateKey *)sKey saveKeyWithIdentifier:identifier];
     }
     return NO;
 }

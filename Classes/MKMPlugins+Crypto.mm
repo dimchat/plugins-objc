@@ -142,7 +142,7 @@ static PlainKey *s_sharedPlainKey = nil;
     NSString *algorithm = [key objectForKey:@"algorithm"];
     // AES key
     if ([algorithm isEqualToString:MKSymmetricAlgorithm_AES]) {
-        return [[MKMAESKey alloc] initWithDictionary:key];
+        return [[DIMAESKey alloc] initWithDictionary:key];
     }
     // Plain Key
     if ([algorithm isEqualToString:MKSymmetricAlgorithm_Plain]) {
@@ -163,11 +163,11 @@ static PlainKey *s_sharedPlainKey = nil;
 - (nullable id<MKPublicKey>)parsePublicKey:(NSDictionary *)key {
     // RSA key
     if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_RSA]) {
-        return [[MKMRSAPublicKey alloc] initWithDictionary:key];
+        return [[DIMRSAPublicKey alloc] initWithDictionary:key];
     }
     // ECC Key
     if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_ECC]) {
-        return [[MKMECCPublicKey alloc] initWithDictionary:key];
+        return [[DIMECCPublicKey alloc] initWithDictionary:key];
     }
     NSAssert(false, @"public key algorithm (%@) not support yet", self.algorithm);
     return nil;
@@ -190,11 +190,11 @@ static PlainKey *s_sharedPlainKey = nil;
 - (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
     // RSA key
     if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_RSA]) {
-        return [[MKMRSAPrivateKey alloc] initWithDictionary:key];
+        return [[DIMRSAPrivateKey alloc] initWithDictionary:key];
     }
     // ECC Key
     if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_ECC]) {
-        return [[MKMECCPrivateKey alloc] initWithDictionary:key];
+        return [[DIMECCPrivateKey alloc] initWithDictionary:key];
     }
     NSAssert(false, @"private key algorithm (%@) not support yet", self.algorithm);
     return nil;

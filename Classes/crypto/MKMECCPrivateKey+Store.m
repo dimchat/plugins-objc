@@ -41,12 +41,12 @@
 
 extern NSString *NSStringFromKeyContent(NSString *content, NSString *tag);
 
-@implementation MKMECCPrivateKey (PersistentStore)
+@implementation DIMECCPrivateKey (PersistentStore)
 
 static NSString *s_application_tag = @"chat.dim.ecc.private";
 
 + (nullable instancetype)loadKeyWithIdentifier:(NSString *)identifier {
-    MKMECCPrivateKey *SK = nil;
+    DIMECCPrivateKey *SK = nil;
     
     NSString *label = identifier;
     NSData *tag = MKUTF8Encode(s_application_tag);
@@ -83,7 +83,7 @@ static NSString *s_application_tag = @"chat.dim.ecc.private";
         NSDictionary *keyInfo = @{@"algorithm":algorithm,
                                   @"data"     :content,
                                   };
-        SK = [[MKMECCPrivateKey alloc] initWithDictionary:keyInfo];
+        SK = [[DIMECCPrivateKey alloc] initWithDictionary:keyInfo];
     } else {
         // sec key item not found
         NSAssert(status == errSecItemNotFound, @"ECC item status error: %d", status);
