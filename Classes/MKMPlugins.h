@@ -39,8 +39,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define MKMAlgorithm_Plain @"PLAIN"
-
 @interface MKMPlugins : NSObject
 
 + (void)loadPlugins;

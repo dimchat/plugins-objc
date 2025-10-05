@@ -221,10 +221,10 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
         NSUInteger len = pem.length;
         if (len == 66 || len == 130) {
             // Hex encode
-            _data = MKMHexDecode(pem);
+            _data = MKHexDecode(pem);
         } else if (len > 0) {
             // PEM
-            _data = [MKMSecKeyHelper publicKeyDataFromContent:pem algorithm:MKMAlgorithm_ECC];
+            _data = [MKMSecKeyHelper publicKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_ECC];
             
             if (_data.length > 65) {
                 // FIXME: X.509 -> Uncompressed Point
@@ -257,7 +257,7 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
 }
 
 - (BOOL)verify:(NSData *)data withSignature:(NSData *)signature {
-    NSData *hash = MKMSHA256Digest(data);
+    NSData *hash = MKSHA256Digest(data);
     uint8_t sig[64];
     @try {
         int res = ecc_der_to_sig(signature.bytes, (int)signature.length, sig);

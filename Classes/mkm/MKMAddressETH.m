@@ -39,8 +39,8 @@
 
 // https://eips.ethereum.org/EIPS/eip-55
 static inline NSString *eip55(NSString *hex) {
-    NSData *utf8 = MKMUTF8Encode(hex);
-    NSData *digest = MKMKECCAK256Digest(utf8);
+    NSData *utf8 = MKUTF8Encode(hex);
+    NSData *digest = MKKeccak256Digest(utf8);
     UInt8 *origin = (UInt8 *)utf8.bytes;
     UInt8 *hash = (UInt8 *)digest.bytes;
     UInt8 buffer[40];
@@ -62,7 +62,7 @@ static inline BOOL is_eth(NSString *address) {
     if (address.length != 42) {
         return NO;
     }
-    NSData *data = MKMUTF8Encode(address);
+    NSData *data = MKUTF8Encode(address);
     UInt8 *buffer = (UInt8 *)data.bytes;
     if (buffer[0] != '0' || buffer[1]!= 'x') {
         return NO;
@@ -125,10 +125,10 @@ static inline BOOL is_eth(NSString *address) {
     }
     NSAssert(fingerprint.length == 64, @"key data length error: %lu", fingerprint.length);
     // 1. digest = keccak256(fingerprint);
-    NSData *digest = MKMKECCAK256Digest(fingerprint);
+    NSData *digest = MKKeccak256Digest(fingerprint);
     // 2. address = hex_encode(digest.suffix(20));
     NSData *tail = [digest subdataWithRange:NSMakeRange(digest.length - 20, 20)];
-    NSString *hex = MKMHexEncode(tail);
+    NSString *hex = MKHexEncode(tail);
     NSString *address = [NSString stringWithFormat:@"0x%@", eip55(hex)];
     return [[self alloc] initWithString:address];
 }

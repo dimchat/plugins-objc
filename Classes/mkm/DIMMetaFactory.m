@@ -81,7 +81,7 @@
                               seed:(nullable NSString *)name {
     id<MKTransportableData> CT;
     if (name.length > 0) {
-        NSData *sig = [SK sign:MKMUTF8Encode(name)];
+        NSData *sig = [SK sign:MKUTF8Encode(name)];
         CT = MKTransportableDataCreate(sig, nil);
     } else {
         CT = nil;

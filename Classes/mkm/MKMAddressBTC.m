@@ -109,13 +109,13 @@
 
 static inline NSData *check_code(NSData *data) {
     assert([data length] == 21);
-    NSData *sha256d = MKMSHA256Digest(MKMSHA256Digest(data));
+    NSData *sha256d = MKSHA256Digest(MKSHA256Digest(data));
     return [sha256d subdataWithRange:NSMakeRange(0, 4)];
 }
 
 + (instancetype)generate:(NSData *)fingerprint type:(MKMEntityType)network {
     // 1. digest = ripemd160(sha256(fingerprint))
-    NSData *digest = MKMRIPEMD160Digest(MKMSHA256Digest(fingerprint));
+    NSData *digest = MKMRIPEMD160Digest(MKSHA256Digest(fingerprint));
     // 2. head = network + digest
     NSMutableData *data = [[NSMutableData alloc] initWithBytes:&network length:1];
     [data appendData:digest];

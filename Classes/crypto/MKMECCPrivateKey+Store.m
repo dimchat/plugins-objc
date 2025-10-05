@@ -49,7 +49,7 @@ static NSString *s_application_tag = @"chat.dim.ecc.private";
     MKMECCPrivateKey *SK = nil;
     
     NSString *label = identifier;
-    NSData *tag = MKMUTF8Encode(s_application_tag);
+    NSData *tag = MKUTF8Encode(s_application_tag);
     
     NSDictionary *query;
     query = @{(id)kSecClass               :(id)kSecClassKey,
@@ -73,13 +73,13 @@ static NSString *s_application_tag = @"chat.dim.ecc.private";
         NSString *content;
         if (privateKeyData.length == 32) {
             // Hex encode
-            content = MKMHexEncode(privateKeyData);
+            content = MKHexEncode(privateKeyData);
         } else {
             // PEM
-            content = MKMBase64Encode(privateKeyData);
+            content = MKBase64Encode(privateKeyData);
             content = NSStringFromKeyContent(content, @"EC PRIVATE");
         }
-        NSString *algorithm = MKMAlgorithm_ECC;
+        NSString *algorithm = MKAsymmetricAlgorithm_ECC;
         NSDictionary *keyInfo = @{@"algorithm":algorithm,
                                   @"data"     :content,
                                   };
@@ -99,7 +99,7 @@ static NSString *s_application_tag = @"chat.dim.ecc.private";
 - (BOOL)saveKeyWithIdentifier:(NSString *)identifier {
     
     NSString *label = identifier;
-    NSData *tag = MKMUTF8Encode(s_application_tag);
+    NSData *tag = MKUTF8Encode(s_application_tag);
     
     NSDictionary *query;
     query = @{(id)kSecClass               :(id)kSecClassKey,

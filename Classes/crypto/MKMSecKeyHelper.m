@@ -35,7 +35,7 @@
 //  Copyright © 2020 Albert Moky. All rights reserved.
 //
 
-#import <MingKeMing/MingKeMing.h>
+#import <DIMCore/DIMCore.h>
 
 #import "MKMSecKeyHelper.h"
 
@@ -132,7 +132,7 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
 @implementation MKMSecKeyHelper
 
 + (NSData *)publicKeyDataFromContent:(NSString *)pem algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
     NSString *base64 = KeyContentFromPEM(pem, name, @"PUBLIC");
@@ -140,10 +140,10 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
 }
 
 + (SecKeyRef)publicKeyFromData:(NSData *)data algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
-    if ([name isEqualToString:MKMAlgorithm_RSA]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_RSA]) {
         return SecKeyRefFromData(data, (__bridge id)kSecAttrKeyTypeRSA, (__bridge id)kSecAttrKeyClassPublic);
     } else if ([name isEqualToString:@"EC"]) {
         return SecKeyRefFromData(data, (__bridge id)kSecAttrKeyTypeECSECPrimeRandom, (__bridge id)kSecAttrKeyClassPublic);
@@ -153,7 +153,7 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
 }
 
 + (NSData *)privateKeyDataFromContent:(NSString *)pem algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
     NSString *base64 = KeyContentFromPEM(pem, name, @"PRIVATE");
@@ -161,10 +161,10 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
 }
 
 + (SecKeyRef)privateKeyFromData:(NSData *)data algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
-    if ([name isEqualToString:MKMAlgorithm_RSA]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_RSA]) {
         return SecKeyRefFromData(data, (__bridge id)kSecAttrKeyTypeRSA, (__bridge id)kSecAttrKeyClassPrivate);
     } else if ([name isEqualToString:@"EC"]) {
         return SecKeyRefFromData(data, (__bridge id)kSecAttrKeyTypeECSECPrimeRandom, (__bridge id)kSecAttrKeyClassPrivate);
@@ -178,22 +178,22 @@ NSString *NSStringFromKeyContent(NSString *content, NSString *tag) {
 }
 
 + (NSString *)serializePublicKey:(SecKeyRef)pKey algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
     NSString *tag = [NSString stringWithFormat:@"%@ PUBLIC", name];
     NSData *data = NSDataFromSecKeyRef(pKey);  // kSecAttrKeyTypeRSA PKCS#1 format
-    NSString *base64 = MKMBase64Encode(data);
+    NSString *base64 = MKBase64Encode(data);
     return NSStringFromKeyContent(base64, tag);
 }
 
 + (NSString *)serializePrivateKey:(SecKeyRef)sKey algorithm:(NSString *)name {
-    if ([name isEqualToString:MKMAlgorithm_ECC]) {
+    if ([name isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         name = @"EC";
     }
     NSString *tag = [NSString stringWithFormat:@"%@ PRIVATE", name];
     NSData *data = NSDataFromSecKeyRef(sKey);
-    NSString *base64 = MKMBase64Encode(data);
+    NSString *base64 = MKBase64Encode(data);
     return NSStringFromKeyContent(base64, tag);
 }
 

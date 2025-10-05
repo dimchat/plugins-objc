@@ -81,7 +81,7 @@ static PlainKey *s_sharedPlainKey = nil;
 }
 
 - (instancetype)init {
-    NSDictionary *dict = @{@"algorithm": MKMAlgorithm_Plain};
+    NSDictionary *dict = @{@"algorithm": MKSymmetricAlgorithm_Plain};
     if (self = [super initWithDictionary:dict]) {
         //
     }
@@ -123,14 +123,14 @@ static PlainKey *s_sharedPlainKey = nil;
 
 @end
 
-@interface SymmetricKeyFactory : KeyFactory <MKMSymmetricKeyFactory>
+@interface SymmetricKeyFactory : KeyFactory <MKSymmetricKeyFactory>
 
 @end
 
 @implementation SymmetricKeyFactory
 
-- (id<MKMSymmetricKey>)generateSymmetricKey {
-    if ([self.algorithm isEqualToString:MKMAlgorithm_Plain]) {
+- (id<MKSymmetricKey>)generateSymmetricKey {
+    if ([self.algorithm isEqualToString:MKSymmetricAlgorithm_Plain]) {
         return [PlainKey sharedInstance];
     }
     NSMutableDictionary *key = [[NSMutableDictionary alloc] init];
@@ -138,14 +138,14 @@ static PlainKey *s_sharedPlainKey = nil;
     return [self parseSymmetricKey:key];
 }
 
-- (nullable id<MKMSymmetricKey>)parseSymmetricKey:(NSDictionary *)key {
+- (nullable id<MKSymmetricKey>)parseSymmetricKey:(NSDictionary *)key {
     NSString *algorithm = [key objectForKey:@"algorithm"];
     // AES key
-    if ([algorithm isEqualToString:MKMAlgorithm_AES]) {
+    if ([algorithm isEqualToString:MKSymmetricAlgorithm_AES]) {
         return [[MKMAESKey alloc] initWithDictionary:key];
     }
     // Plain Key
-    if ([algorithm isEqualToString:MKMAlgorithm_Plain]) {
+    if ([algorithm isEqualToString:MKSymmetricAlgorithm_Plain]) {
         return [PlainKey sharedInstance];
     }
     NSAssert(false, @"symmetric key algorithm (%@) not support yet", algorithm);
@@ -154,19 +154,19 @@ static PlainKey *s_sharedPlainKey = nil;
 
 @end
 
-@interface PublicKeyFactory : KeyFactory <MKMPublicKeyFactory>
+@interface PublicKeyFactory : KeyFactory <MKPublicKeyFactory>
 
 @end
 
 @implementation PublicKeyFactory
 
-- (nullable id<MKMPublicKey>)parsePublicKey:(NSDictionary *)key {
+- (nullable id<MKPublicKey>)parsePublicKey:(NSDictionary *)key {
     // RSA key
-    if ([self.algorithm isEqualToString:MKMAlgorithm_RSA]) {
+    if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_RSA]) {
         return [[MKMRSAPublicKey alloc] initWithDictionary:key];
     }
     // ECC Key
-    if ([self.algorithm isEqualToString:MKMAlgorithm_ECC]) {
+    if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         return [[MKMECCPublicKey alloc] initWithDictionary:key];
     }
     NSAssert(false, @"public key algorithm (%@) not support yet", self.algorithm);
@@ -189,11 +189,11 @@ static PlainKey *s_sharedPlainKey = nil;
 
 - (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
     // RSA key
-    if ([self.algorithm isEqualToString:MKMAlgorithm_RSA]) {
+    if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_RSA]) {
         return [[MKMRSAPrivateKey alloc] initWithDictionary:key];
     }
     // ECC Key
-    if ([self.algorithm isEqualToString:MKMAlgorithm_ECC]) {
+    if ([self.algorithm isEqualToString:MKAsymmetricAlgorithm_ECC]) {
         return [[MKMECCPrivateKey alloc] initWithDictionary:key];
     }
     NSAssert(false, @"private key algorithm (%@) not support yet", self.algorithm);
@@ -206,22 +206,22 @@ static PlainKey *s_sharedPlainKey = nil;
 
 + (void)registerKeyFactories {
     // Symmetric key
-    MKMSymmetricKeySetFactory(MKMAlgorithm_AES,
-                              [[SymmetricKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_AES]);
-    MKMSymmetricKeySetFactory(MKMAlgorithm_Plain,
-                              [[SymmetricKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_Plain]);
+    MKSymmetricKeySetFactory(MKSymmetricAlgorithm_AES,
+                             [[SymmetricKeyFactory alloc] initWithAlgorithm:MKSymmetricAlgorithm_AES]);
+    MKSymmetricKeySetFactory(MKSymmetricAlgorithm_Plain,
+                             [[SymmetricKeyFactory alloc] initWithAlgorithm:MKSymmetricAlgorithm_Plain]);
 
     // public key
-    MKMPublicKeySetFactory(MKMAlgorithm_RSA,
-                           [[PublicKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_RSA]);
-    MKMPublicKeySetFactory(MKMAlgorithm_ECC,
-                           [[PublicKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_ECC]);
+    MKPublicKeySetFactory(MKAsymmetricAlgorithm_RSA,
+                          [[PublicKeyFactory alloc] initWithAlgorithm:MKAsymmetricAlgorithm_RSA]);
+    MKPublicKeySetFactory(MKAsymmetricAlgorithm_ECC,
+                          [[PublicKeyFactory alloc] initWithAlgorithm:MKAsymmetricAlgorithm_ECC]);
 
     // private key
-    MKPrivateKeySetFactory(MKMAlgorithm_RSA,
-                            [[PrivateKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_RSA]);
-    MKPrivateKeySetFactory(MKMAlgorithm_ECC,
-                            [[PrivateKeyFactory alloc] initWithAlgorithm:MKMAlgorithm_ECC]);
+    MKPrivateKeySetFactory(MKAsymmetricAlgorithm_RSA,
+                            [[PrivateKeyFactory alloc] initWithAlgorithm:MKAsymmetricAlgorithm_RSA]);
+    MKPrivateKeySetFactory(MKAsymmetricAlgorithm_ECC,
+                            [[PrivateKeyFactory alloc] initWithAlgorithm:MKAsymmetricAlgorithm_ECC]);
 }
 
 @end
@@ -235,11 +235,11 @@ static PlainKey *s_sharedPlainKey = nil;
     DIMRegisterDataParsers();
     
     // PNF
-    MKMPortableNetworkFileSetFactory([[DIMBaseFileFactory alloc] init]);
+    MKPortableNetworkFileSetFactory([[DIMBaseFileFactory alloc] init]);
     
     // TED
     DIMBase64DataFactory *b64Factory = [[DIMBase64DataFactory alloc] init];
-    MKTransportableDataSetFactory(MKMAlgorithm_Base64, b64Factory);
+    MKTransportableDataSetFactory(MKEncodeAlgorithm_BASE64, b64Factory);
     //MKTransportableDataSetFactory(MKMAlgorithm_TransportableDefault, b64Factory);
     MKTransportableDataSetFactory(@"*", b64Factory);
 }

@@ -105,7 +105,7 @@
 - (NSData *)data {
     if (!_data) {
         NSString *pem = [self objectForKey:@"data"];
-        _data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKMAlgorithm_RSA];
+        _data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_RSA];
     }
     return _data;
 }
@@ -147,8 +147,8 @@
         NSString *pem = [self objectForKey:@"data"];
         if (pem) {
             // key from data
-            NSData *data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKMAlgorithm_RSA];
-            _privateKeyRef = [MKMSecKeyHelper privateKeyFromData:data algorithm:MKMAlgorithm_RSA];
+            NSData *data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_RSA];
+            _privateKeyRef = [MKMSecKeyHelper privateKeyFromData:data algorithm:MKAsymmetricAlgorithm_RSA];
             return _privateKeyRef;
         }
         
@@ -177,7 +177,7 @@
         NSAssert(_privateKeyRef, @"RSA private key ref should be set here");
         
         // 2.4. key to data
-        pem = [MKMSecKeyHelper serializePrivateKey:_privateKeyRef algorithm:MKMAlgorithm_RSA];
+        pem = [MKMSecKeyHelper serializePrivateKey:_privateKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
         [self setObject:pem forKey:@"data"];
         
         // 3. other parameters
@@ -192,8 +192,8 @@
     if (!_publicKey) {
         // get public key content from private key
         SecKeyRef publicKeyRef = SecKeyCopyPublicKey(self.privateKeyRef);
-        NSString *pem = [MKMSecKeyHelper serializePublicKey:publicKeyRef algorithm:MKMAlgorithm_RSA];
-        NSDictionary *dict = @{@"algorithm":MKMAlgorithm_RSA,
+        NSString *pem = [MKMSecKeyHelper serializePublicKey:publicKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
+        NSDictionary *dict = @{@"algorithm":MKAsymmetricAlgorithm_RSA,
                                @"data"     :pem,
                                @"mode"     :@"ECB",
                                @"padding"  :@"PKCS1",

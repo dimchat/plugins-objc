@@ -53,7 +53,7 @@ static NSString *s_application_tag = @"chat.dim.rsa.private";
     MKMRSAPrivateKey *SK = nil;
     
     NSString *label = identifier;
-    NSData *tag = MKMUTF8Encode(s_application_tag);
+    NSData *tag = MKUTF8Encode(s_application_tag);
     
     NSDictionary *query;
     query = @{(id)kSecClass               :(id)kSecClassKey,
@@ -74,13 +74,13 @@ static NSString *s_application_tag = @"chat.dim.rsa.private";
     if (status == errSecSuccess) { // noErr
         // private key
         SecKeyRef privateKeyRef = (SecKeyRef)result;
-        NSString *skc = [MKMSecKeyHelper serializePrivateKey:privateKeyRef algorithm:MKMAlgorithm_RSA];
+        NSString *skc = [MKMSecKeyHelper serializePrivateKey:privateKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
         // public key
         SecKeyRef publicKeyRef = SecKeyCopyPublicKey(privateKeyRef);
-        NSString *pkc = [MKMSecKeyHelper serializePublicKey:publicKeyRef algorithm:MKMAlgorithm_RSA];
+        NSString *pkc = [MKMSecKeyHelper serializePublicKey:publicKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
         // key content
         NSString *content = [NSString stringWithFormat:@"%@%@", pkc, skc];
-        NSString *algorithm = MKMAlgorithm_RSA;
+        NSString *algorithm = MKAsymmetricAlgorithm_RSA;
         NSDictionary *keyInfo = @{@"algorithm":algorithm,
                                   @"data"     :content,
                                   };
@@ -104,7 +104,7 @@ static NSString *s_application_tag = @"chat.dim.rsa.private";
     }
     
     NSString *label = identifier;
-    NSData *tag = MKMUTF8Encode(s_application_tag);
+    NSData *tag = MKUTF8Encode(s_application_tag);
     
     NSDictionary *query;
     query = @{(id)kSecClass               :(id)kSecClassKey,
