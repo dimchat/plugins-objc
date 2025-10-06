@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMAESKey : DIMSymmetricKey
 
++ (instancetype)newKey;
++ (instancetype)newKey:(NSUInteger)keySize;
+
 @end
 
 @interface DIMAESKeyFactory : NSObject <MKSymmetricKeyFactory>

@@ -91,7 +91,7 @@
         return bytes * sizeof(uint8_t);
     }
     return [self unsignedIntegerForKey:@"keySize"
-                          defaultValue:1024 / 8]; // 128
+                          defaultValue:(1024 / 8)]; // 128
 }
 
 // Override
@@ -131,9 +131,45 @@
     return _publicKeyRef;
 }
 
-#pragma mark - Protocol
+// Override
+- (BOOL)verify:(NSData *)data withSignature:(NSData *)signature {
+    NSAssert(data.length > 0, @"[RSA] data cannot be empty");
+    if (signature.length != (self.keySize)) {
+        NSLog(@"[RSA] signature length not match: %lu", signature.length);
+        return NO;
+    }
+    BOOL OK = NO;
+    
+    @try {
+        SecKeyRef keyRef = self.publicKeyRef;
+        NSAssert(keyRef != NULL, @"RSA public key error");
+        
+        CFErrorRef error = NULL;
+        SecKeyAlgorithm alg = kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256;
+        OK = SecKeyVerifySignature(keyRef,
+                                   alg,
+                                   (CFDataRef)data,
+                                   (CFDataRef)signature,
+                                   &error);
+        if (error) {
+            NSLog(@"[RSA] failed to verify: %@", error);
+            NSAssert(!OK, @"RSA verify error");
+            //NSAssert(false, @"RSA verify error: %@", error);
+            CFRelease(error);
+            error = NULL;
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"[RSA] failed to verify: %@", exception);
+    } @finally {
+        //
+    }
+    
+    return OK;
+}
 
-- (NSData *)encrypt:(NSData *)plaintext extra:(nullable NSMutableDictionary *)params {
+// Override
+- (NSData *)encrypt:(NSData *)plaintext
+              extra:(nullable NSMutableDictionary<NSString *, id> *)params {
     NSAssert(plaintext.length > 0, @"[RSA] data cannot be empty");
     NSAssert(plaintext.length <= (self.keySize - 11), @"[RSA] data too long: %lu", plaintext.length);
     NSData *ciphertext = nil;
@@ -169,39 +205,18 @@
     return ciphertext;
 }
 
-- (BOOL)verify:(NSData *)data withSignature:(NSData *)signature {
-    NSAssert(data.length > 0, @"[RSA] data cannot be empty");
-    if (signature.length != (self.keySize)) {
-        NSLog(@"[RSA] signature length not match: %lu", signature.length);
-        return NO;
+@end
+
+@implementation DIMRSAPublicKeyFactory
+
+- (nullable id<MKPublicKey>)parsePublicKey:(NSDictionary *)key {
+    // check 'data'
+    if ([key objectForKey:@"data"] == nil) {
+        // key.data should not be empty
+        NSAssert(false, @"RSA key error: %@", key);
+        return nil;
     }
-    BOOL OK = NO;
-    
-    @try {
-        SecKeyRef keyRef = self.publicKeyRef;
-        NSAssert(keyRef != NULL, @"RSA public key error");
-        
-        CFErrorRef error = NULL;
-        SecKeyAlgorithm alg = kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256;
-        OK = SecKeyVerifySignature(keyRef,
-                                   alg,
-                                   (CFDataRef)data,
-                                   (CFDataRef)signature,
-                                   &error);
-        if (error) {
-            NSLog(@"[RSA] failed to verify: %@", error);
-            NSAssert(!OK, @"RSA verify error");
-            //NSAssert(false, @"RSA verify error: %@", error);
-            CFRelease(error);
-            error = NULL;
-        }
-    } @catch (NSException *exception) {
-        NSLog(@"[RSA] failed to verify: %@", exception);
-    } @finally {
-        //
-    }
-    
-    return OK;
+    return [[DIMRSAPublicKey alloc] initWithDictionary:key];
 }
 
 @end

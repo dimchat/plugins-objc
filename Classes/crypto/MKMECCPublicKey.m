@@ -167,7 +167,7 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
 - (NSUInteger)keySize {
     // TODO: get from key data
     return [self unsignedIntegerForKey:@"keySize"
-                          defaultValue:256 / 8]; // 32
+                          defaultValue:(256 / 8)]; // 32
 }
 
 // protected

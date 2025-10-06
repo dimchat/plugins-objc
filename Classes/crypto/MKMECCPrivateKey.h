@@ -50,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 */
 @interface DIMECCPrivateKey : DIMPrivateKey
 
++ (instancetype)newKey;
+
 @end
 
 @interface DIMECCPrivateKey (PersistentStore)

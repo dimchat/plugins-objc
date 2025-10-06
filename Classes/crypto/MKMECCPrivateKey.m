@@ -143,11 +143,32 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
     return key;
 }
 
++ (instancetype)newKey {
+    // TODO: check key size?
+    uint8_t pubkey[64] = {0};
+    uint8_t prikey[32] = {0};
+    int res = uECC_make_key(pubkey, prikey, uECC_secp256k1());
+    if (res != 1) {
+        NSAssert(false, @"failed to generate ECC private key");
+        return nil;
+    }
+    NSData *data = [[NSData alloc] initWithBytes:prikey length:32];
+    // build key info
+    DIMECCPrivateKey *key = [[DIMECCPrivateKey alloc] initWithDictionary:@{
+        @"algorithm" : MKAsymmetricAlgorithm_ECC,
+        @"data"      : MKHexEncode(data),
+        @"curve"     : @"SECP256k1",
+        @"digest"    : @"SHA256",
+    }];
+    key.keyData = data;
+    return key;
+}
+
 // protected
 - (NSUInteger)keySize {
     // TODO: get from key data
     return [self unsignedIntegerForKey:@"keySize"
-                          defaultValue:256 / 8]; // 32
+                          defaultValue:(256 / 8)]; // 32
 }
 
 // protected
@@ -166,32 +187,23 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
 // Override
 - (NSData *)data {
     NSData *bin = _keyData;
-    if (!bin) {
-        NSString *pem = [self objectForKey:@"data"];
-        // check for raw data (32 bytes)
-        NSUInteger len = pem.length;
-        if (len == 64) {
-            // Hex encode
-            bin = MKHexDecode(pem);
-        } else if (len > 0) {
-            // PEM
-            bin = [MKMSecKeyHelper privateKeyDataFromContent:pem
-                                                   algorithm:MKAsymmetricAlgorithm_ECC];
-        } else {
-            // generate it
-            // TODO: check key size?
-            uint8_t pubkey[64] = {0};
-            uint8_t prikey[32] = {0};
-            int res = uECC_make_key(pubkey, prikey, self.curve);
-            if (res != 1) {
-                NSAssert(false, @"failed to generate ECC private key");
-                return nil;
-            }
-            bin = [[NSData alloc] initWithBytes:prikey length:32];
-            [self setObject:MKHexEncode(bin) forKey:@"data"];
-        }
-        _keyData = bin;
+    if (bin) {
+        return bin;
     }
+    NSString *pem = [self objectForKey:@"data"];
+    // check for raw data (32 bytes)
+    NSUInteger len = pem.length;
+    if (len == 64) {
+        // Hex encode
+        bin = MKHexDecode(pem);
+    } else if (len > 0) {
+        // PEM
+        bin = [MKMSecKeyHelper privateKeyDataFromContent:pem
+                                               algorithm:MKAsymmetricAlgorithm_ECC];
+    } else {
+        NSAssert(false, @"ECC private key data not found: %@", self);
+    }
+    _keyData = bin;
     return bin;
 }
 
@@ -218,7 +230,7 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
         _pubKey = [[DIMECCPublicKey alloc] initWithDictionary:@{
             @"algorithm" : MKAsymmetricAlgorithm_ECC,
             @"data"      : hex,
-            @"curve"     : @"secp256k1",
+            @"curve"     : @"SECP256k1",
             @"digest"    : @"SHA256",
         }];
     }
@@ -237,6 +249,24 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
     uint8_t vchSig[72];
     size_t nSigLen = ecc_sig_to_der(sig, vchSig);
     return [[NSData alloc] initWithBytes:vchSig length:nSigLen];
+}
+
+@end
+
+@implementation DIMECCPrivateKeyFactory
+
+- (id<MKPrivateKey>)generatePrivateKey {
+    return [DIMECCPrivateKey newKey];
+}
+
+- (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
+    // check 'data'
+    if ([key objectForKey:@"data"] == nil) {
+        // key.data should not be empty
+        NSAssert(false, @"ECC key error: %@", key);
+        return nil;
+    }
+    return [[DIMECCPrivateKey alloc] initWithDictionary:key];
 }
 
 @end

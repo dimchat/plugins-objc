@@ -40,11 +40,14 @@
 
 #import "MKMRSAPrivateKey.h"
 
+extern NSData *NSDataFromSecKeyRef(SecKeyRef keyRef);
+extern NSString *NSStringFromKeyContent(NSString *content, NSString *tag);
+
 @interface DIMRSAPrivateKey () {
     
     SecKeyRef _privateKeyRef;
     
-    id<MKPublicKey> _publicKey;
+    id<MKPublicKey> _pubKey;
 }
 
 @property (readonly, nonatomic) NSUInteger keySize;
@@ -63,7 +66,7 @@
         // lazy load
         _keyData = nil;
         _privateKeyRef = NULL;
-        _publicKey = nil;
+        _pubKey = nil;
     }
     
     return self;
@@ -82,11 +85,57 @@
     if (key) {
         key.keyData = _keyData;
         key.privateKeyRef = _privateKeyRef;
-        key.publicKey = _publicKey;
+        key.publicKey = _pubKey;
     }
     return key;
 }
 
++ (instancetype)newKey {
+    return [self newKey:(1024 / 8)]; // 128
+}
+
++ (instancetype)newKey:(NSUInteger)keySize {
+    // 2. prepare parameters
+    NSDictionary *params;
+    params = @{(id)kSecAttrKeyType      :(id)kSecAttrKeyTypeRSA,
+               (id)kSecAttrKeySizeInBits:@(keySize * 8),
+               //(id)kSecAttrIsPermanent:@YES,
+               };
+    // 3. generate
+    CFErrorRef error = NULL;
+    SecKeyRef keyRef = SecKeyCreateRandomKey((CFDictionaryRef)params,
+                                             &error);
+    if (error) {
+        NSAssert(!keyRef, @"RSA key ref should be empty when failed");
+        NSAssert(false, @"RSA failed to generate key: %@", error);
+        CFRelease(error);
+        error = NULL;
+        return nil;
+    }
+    NSAssert(keyRef, @"RSA private key ref should be set here");
+    
+    // 4. key to data
+    NSData *data = NSDataFromSecKeyRef(keyRef);
+    NSString *base64 = MKBase64Encode(data);
+    NSString *pem = NSStringFromKeyContent(base64, @"RSA PRIVATE");
+    //NSString *pem = [MKMSecKeyHelper serializePrivateKey:keyRef
+    //                                           algorithm:MKAsymmetricAlgorithm_RSA];
+    //data = [MKMSecKeyHelper privateKeyDataFromContent:pem
+    //                                        algorithm:MKAsymmetricAlgorithm_RSA];
+    // 5. build key info
+    DIMRSAPrivateKey *key = [[DIMRSAPrivateKey alloc] initWithDictionary:@{
+        @"algorithm" : MKAsymmetricAlgorithm_RSA,
+        @"data"      : pem,
+        @"mode"      : @"ECB",
+        @"padding"   : @"PKCS1",
+        @"digest"    : @"SHA256",
+    }];
+    key.keyData = data;
+    key.privateKeyRef = keyRef;
+    return key;
+}
+
+// protected
 - (NSUInteger)keySize {
     // get from key data
     if (_privateKeyRef || [self objectForKey:@"data"]) {
@@ -94,21 +143,29 @@
         return bytes * sizeof(uint8_t);
     }
     return [self unsignedIntegerForKey:@"keySize"
-                          defaultValue:1024 / 8]; // 128
+                          defaultValue:(1024 / 8)]; // 128
 }
 
 // Override
 - (NSData *)data {
     NSData *bin = _keyData;
-    if (!bin) {
-        NSString *pem = [self objectForKey:@"data"];
+    if (bin) {
+        return bin;
+    }
+    NSString *pem = [self objectForKey:@"data"];
+    NSUInteger len = pem.length;
+    if (len > 0) {
+        // PEM
         bin = [MKMSecKeyHelper privateKeyDataFromContent:pem
                                                algorithm:MKAsymmetricAlgorithm_RSA];
-        _keyData = bin;
+    } else {
+        NSAssert(false, @"RSA private key data not found: %@", self);
     }
+    _keyData = bin;
     return bin;
 }
 
+// protected
 - (void)setPrivateKeyRef:(SecKeyRef)privateKeyRef {
     if (_privateKeyRef != privateKeyRef) {
         if (_privateKeyRef) {
@@ -121,76 +178,73 @@
     }
 }
 
+// protected
 - (SecKeyRef)privateKeyRef {
-    if (!_privateKeyRef) {
-        // 1. get private key from data content
-        NSString *pem = [self objectForKey:@"data"];
-        if (pem) {
-            // key from data
-            NSData *data = [MKMSecKeyHelper privateKeyDataFromContent:pem algorithm:MKAsymmetricAlgorithm_RSA];
-            _privateKeyRef = [MKMSecKeyHelper privateKeyFromData:data algorithm:MKAsymmetricAlgorithm_RSA];
-            return _privateKeyRef;
-        }
-        
-        // 2. generate key pairs
-        NSAssert(!_publicKey, @"RSA public key should not be set yet");
-        
-        // 2.1. key size
-        NSUInteger keySize = self.keySize;
-        // 2.2. prepare parameters
-        NSDictionary *params;
-        params = @{(id)kSecAttrKeyType      :(id)kSecAttrKeyTypeRSA,
-                   (id)kSecAttrKeySizeInBits:@(keySize * 8),
-                   //(id)kSecAttrIsPermanent:@YES,
-                   };
-        // 2.3. generate
-        CFErrorRef error = NULL;
-        _privateKeyRef = SecKeyCreateRandomKey((CFDictionaryRef)params,
-                                               &error);
-        if (error) {
-            NSAssert(!_privateKeyRef, @"RSA key ref should be empty when failed");
-            NSAssert(false, @"RSA failed to generate key: %@", error);
-            CFRelease(error);
-            error = NULL;
-            return nil;
-        }
-        NSAssert(_privateKeyRef, @"RSA private key ref should be set here");
-        
-        // 2.4. key to data
-        pem = [MKMSecKeyHelper serializePrivateKey:_privateKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
-        [self setObject:pem forKey:@"data"];
-        
-        // 3. other parameters
-        [self setObject:@"ECB" forKey:@"mode"];
-        [self setObject:@"PKCS1" forKey:@"padding"];
-        [self setObject:@"SHA256" forKey:@"digest"];
+    SecKeyRef key = _privateKeyRef;
+    NSData *data = [self data];
+    if (data && !key) {
+        key = [MKMSecKeyHelper privateKeyFromData:data
+                                        algorithm:MKAsymmetricAlgorithm_RSA];
+        _privateKeyRef = key;
     }
-    return _privateKeyRef;
+    return key;
 }
 
+// protected
+- (void)setPublicKey:(nullable id<MKPublicKey>)publicKey {
+    _pubKey = publicKey;
+}
+
+// Override
 - (id<MKPublicKey>)publicKey {
-    if (!_publicKey) {
+    if (!_pubKey) {
         // get public key content from private key
         SecKeyRef publicKeyRef = SecKeyCopyPublicKey(self.privateKeyRef);
-        NSString *pem = [MKMSecKeyHelper serializePublicKey:publicKeyRef algorithm:MKAsymmetricAlgorithm_RSA];
-        NSDictionary *dict = @{@"algorithm":MKAsymmetricAlgorithm_RSA,
-                               @"data"     :pem,
-                               @"mode"     :@"ECB",
-                               @"padding"  :@"PKCS1",
-                               @"digest"   :@"SHA256",
-                               };
-        _publicKey = [[DIMRSAPublicKey alloc] initWithDictionary:dict];
+        NSString *pem;
+        pem = [MKMSecKeyHelper serializePublicKey:publicKeyRef
+                                        algorithm:MKAsymmetricAlgorithm_RSA];
+        _pubKey = [[DIMRSAPublicKey alloc] initWithDictionary:@{
+            @"algorithm" : MKAsymmetricAlgorithm_RSA,
+            @"data"      : pem,
+            @"mode"      : @"ECB",
+            @"padding"   : @"PKCS1",
+            @"digest"    : @"SHA256",
+        }];
     }
-    return _publicKey;
+    return _pubKey;
 }
 
-- (void)setPublicKey:(nullable id<MKPublicKey>)publicKey {
-    _publicKey = publicKey;
+// Override
+- (NSData *)sign:(NSData *)data {
+    NSAssert(self.privateKeyRef != NULL, @"RSA private key cannot be empty");
+    NSAssert(data.length > 0, @"RSA data cannot be empty");
+    NSData *signature = nil;
+    
+    CFErrorRef error = NULL;
+    SecKeyAlgorithm alg = kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256;
+    CFDataRef CT;
+    CT = SecKeyCreateSignature(self.privateKeyRef,
+                               alg,
+                               (CFDataRef)data,
+                               &error);
+    if (error) {
+        NSLog(@"[RSA] failed to sign: %@", error);
+        NSAssert(!CT, @"RSA signature should be empty when failed");
+        NSAssert(false, @"RSA sign error: %@", error);
+        CFRelease(error);
+        error = NULL;
+    } else {
+        NSAssert(CT, @"RSA signature should not be empty");
+        signature = (__bridge_transfer NSData *)CT;
+    }
+    
+    NSAssert(signature, @"RSA sign failed");
+    return signature;
 }
 
-#pragma mark - Protocol
-
-- (nullable NSData *)decrypt:(NSData *)ciphertext params:(nullable NSDictionary *)extra {
+// Override
+- (nullable NSData *)decrypt:(NSData *)ciphertext
+                      params:(nullable NSDictionary<NSString *, id> *)extra {
     if (ciphertext.length != (self.keySize)) {
         NSLog(@"[RSA] ciphertext length not correct: %lu", ciphertext.length);
         return nil;
@@ -228,35 +282,27 @@
     return plaintext;
 }
 
-- (NSData *)sign:(NSData *)data {
-    NSAssert(self.privateKeyRef != NULL, @"RSA private key cannot be empty");
-    NSAssert(data.length > 0, @"RSA data cannot be empty");
-    NSData *signature = nil;
-    
-    CFErrorRef error = NULL;
-    SecKeyAlgorithm alg = kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256;
-    CFDataRef CT;
-    CT = SecKeyCreateSignature(self.privateKeyRef,
-                               alg,
-                               (CFDataRef)data,
-                               &error);
-    if (error) {
-        NSLog(@"[RSA] failed to sign: %@", error);
-        NSAssert(!CT, @"RSA signature should be empty when failed");
-        NSAssert(false, @"RSA sign error: %@", error);
-        CFRelease(error);
-        error = NULL;
-    } else {
-        NSAssert(CT, @"RSA signature should not be empty");
-        signature = (__bridge_transfer NSData *)CT;
-    }
-    
-    NSAssert(signature, @"RSA sign failed");
-    return signature;
-}
-
+// Override
 - (BOOL)matchEncryptKey:(id<MKEncryptKey>)pKey {
     return DIMCryptoMatchEncryptKey(pKey, self);
+}
+
+@end
+
+@implementation DIMRSAPrivateKeyFactory
+
+- (id<MKPrivateKey>)generatePrivateKey {
+    return [DIMRSAPrivateKey newKey];
+}
+
+- (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key { 
+    // check 'data'
+    if ([key objectForKey:@"data"] == nil) {
+        // key.data should not be empty
+        NSAssert(false, @"RSA key error: %@", key);
+        return nil;
+    }
+    return [[DIMRSAPrivateKey alloc] initWithDictionary:key];
 }
 
 @end

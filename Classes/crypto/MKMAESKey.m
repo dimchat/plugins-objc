@@ -65,14 +65,8 @@ static inline NSData *random_data(NSUInteger size) {
         // 1. check mode = 'CBC'
         // 2. check padding = 'PKCS7Padding'
 
-        // check key data
-        if ([self objectForKey:@"data"]) {
-            // lazy load
-            _tedKey = nil;
-        } else {
-            // new key
-            _tedKey = [self _generateKeyData];
-        }
+        // lazy load
+        _tedKey = nil;
     }
     
     return self;
@@ -86,20 +80,21 @@ static inline NSData *random_data(NSUInteger size) {
     return key;
 }
 
-// protected
-- (id<MKTransportableData>)_generateKeyData {
-    // random key data
-    NSUInteger keySize = [self keySize];
-    NSData *pw = random_data(keySize);
-    id<MKTransportableData> ted = MKTransportableDataCreate(pw, nil);
-    
-    [self setObject:ted.object forKey:@"data"];
-    
-    // other parameters
-    //[self setObject:@"CBC" forKey:@"mode"];
-    //[self setObject:@"PKCS7" forKey:@"padding"];
-    
-    return ted;
++ (instancetype)newKey {
+    return [self newKey:kCCKeySizeAES256]; // 32
+}
+
++ (instancetype)newKey:(NSUInteger)keySize {
+    NSData *data = random_data(keySize);
+    id<MKTransportableData> ted = MKTransportableDataCreate(data, nil);
+    DIMAESKey *key = [[DIMAESKey alloc] initWithDictionary:@{
+        @"algorithm": MKSymmetricAlgorithm_AES,
+        @"data": ted.object,
+        //@"mode": @"CBC",
+        //@"padding": @"PKCS7",
+    }];
+    key.tedKey = ted;
+    return key;
 }
 
 // protected
@@ -122,10 +117,11 @@ static inline NSData *random_data(NSUInteger size) {
     if (!ted) {
         id base64 = [self objectForKey:@"data"];
         if (base64) {
-            _tedKey = ted = MKTransportableDataParse(base64);
+            ted = MKTransportableDataParse(base64);
             NSAssert(ted, @"key data error: %@", base64);
+            _tedKey = ted;
         } else {
-            NSAssert(false, @"key data not found: %@", self);
+            NSAssert(false, @"AES key data not found: %@", self);
         }
     }
     return [ted data];
@@ -202,7 +198,8 @@ static inline NSData *random_data(NSUInteger size) {
 }
 
 // Override
-- (nullable NSData *)decrypt:(NSData *)ciphertext params:(nullable NSDictionary<NSString *,id> *)extra {
+- (nullable NSData *)decrypt:(NSData *)ciphertext
+                      params:(nullable NSDictionary<NSString *,id> *)extra {
     NSAssert(self.keySize == kCCKeySizeAES256, @"only support AES-256 now");
     // 1. if 'IV' not found in extra params, use an empty 'IV'
     NSData *iv = [self getInitVector:extra];
@@ -232,10 +229,7 @@ static inline NSData *random_data(NSUInteger size) {
 
 // Override
 - (id<MKSymmetricKey>)generateSymmetricKey {
-    NSDictionary *key = @{
-        @"algorithm": MKSymmetricAlgorithm_AES,
-    };
-    return [[DIMAESKey alloc] initWithDictionary:key];
+    return [DIMAESKey newKey];
 }
 
 // Override
