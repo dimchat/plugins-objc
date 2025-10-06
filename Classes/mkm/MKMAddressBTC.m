@@ -37,10 +37,9 @@
 
 #import "MKMAddressBTC.h"
 
-@interface MKMAddressBTC () {
-    
-    MKMEntityType _network;
-}
+@interface MKMAddressBTC ()
+
+@property (nonatomic) MKMEntityType network; // Network ID
 
 @end
 
@@ -80,29 +79,9 @@
 - (id)copyWithZone:(nullable NSZone *)zone {
     MKMAddressBTC *address = [super copyWithZone:zone];
     if (address) {
-        address.type = _network;
+        address.network = _network;
     }
     return address;
-}
-
-- (MKMEntityType)network {
-    return _network;
-}
-
-- (void)setType:(MKMEntityType)network {
-    _network = network;
-}
-
-- (BOOL)isBroadcast {
-    return NO;
-}
-
-- (BOOL)isUser {
-    return MKMEntityTypeIsUser(_network);
-}
-
-- (BOOL)isGroup {
-    return MKMEntityTypeIsGroup(_network);
 }
 
 #pragma mark Coding

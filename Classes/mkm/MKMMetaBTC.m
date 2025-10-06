@@ -39,20 +39,12 @@
 
 #import "MKMMetaBTC.h"
 
-@interface MKMMetaBTC () {
-    
-    // cache
-    MKMAddressBTC *_cachedAddress;
-}
-
-@end
-
 @implementation MKMMetaBTC
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     if (self = [super initWithDictionary:dict]) {
-        _cachedAddress = nil;
+        _cachedAddresses = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -66,20 +58,29 @@
                                key:publicKey
                               seed:seed
                        fingerprint:CT]) {
-        _cachedAddress = nil;
+        _cachedAddresses = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
+// Override
+- (BOOL)hasSeed {
+    return NO;
+    //return [self objectForKey:@"seed"] && [self objectForKey:@"fingerprint"];
+}
+
+// Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
     NSAssert(self.type == MKMMetaType_BTC || self.type == MKMMetaType_ExBTC,
              @"meta version error: %@", self.type);
-    MKMAddressBTC *address = _cachedAddress;
-    if (!address || [address network] != network) {
+    MKMAddressBTC *address = [_cachedAddresses objectForKey:@(network)];
+    if (!address) {
         // TODO: compress public key?
-        NSData *data = [self.publicKey data];
+        id<MKVerifyKey> key = [self publicKey];
+        NSData *data = [key data];
         // generate and cache it
-        _cachedAddress = address = [MKMAddressBTC generate:data type:network];
+        address = [MKMAddressBTC generate:data type:network];
+        [_cachedAddresses setObject:address forKey:@(network)];
     }
     return address;
 }

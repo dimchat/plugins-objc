@@ -42,13 +42,6 @@
 
 #import "DIMAddressFactory.h"
 
-@interface DIMAddressFactory () {
-    
-    NSMutableDictionary<NSString *, id<MKMAddress>> *_addresses;
-}
-
-@end
-
 @implementation DIMAddressFactory
 
 - (instancetype)init {
@@ -58,6 +51,7 @@
     return self;
 }
 
+// Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network
                          withMeta:(id<MKMMeta>)meta {
     id<MKMAddress> address = [meta generateAddress:network];
@@ -66,10 +60,11 @@
     return address;
 }
 
+// Override
 - (nullable id<MKMAddress>)parseAddress:(NSString *)address {
     id<MKMAddress> addr = [_addresses objectForKey:address];
     if (!addr) {
-        addr = [self createAddress:address];
+        addr = [self parse:address];
         if (addr) {
             [_addresses setObject:addr forKey:address];
         }
@@ -77,35 +72,13 @@
     return addr;
 }
 
-- (nullable id<MKMAddress>)createAddress:(NSString *)address {
-    NSAssert(false, @"implement me!");
-    return nil;
-}
-
-@end
-
-@implementation DIMAddressFactory (Thanos)
-
-- (NSUInteger)reduceMemory {
-    NSUInteger snap = 0;
-//    snap = DIMThanos(_addresses, snap);
-    return snap;
-}
-
-@end
-
-#pragma mark -
-
-@interface AddressFactory : DIMAddressFactory
-
-@end
-
-@implementation AddressFactory
-
-- (nullable id<MKMAddress>)createAddress:(NSString *)address {
+- (nullable id<MKMAddress>)parse:(NSString *)address {
     NSComparisonResult res;
     NSUInteger len = [address length];
-    if (len == 8) {
+    if (len == 0) {
+        NSAssert(false, @"address should not be empty");
+        return nil;
+    } else if (len == 8) {
         // "anywhere"
         res = [MKMAnywhere().string caseInsensitiveCompare:address];
         if (res == NSOrderedSame) {
@@ -119,20 +92,19 @@
         }
     }
     id<MKMAddress> addr;
-    if (len == 42) {
-        // ETH address
-        addr = [MKMAddressETH parse:address];
-    } else if (26 <= len && len <= 35) {
-        // try BTC address
+    if (26 <= len && len <= 35) {
+        // BTC
         addr = [MKMAddressBTC parse:address];
+    } else if (len == 42) {
+        // ETH
+        addr = [MKMAddressETH parse:address];
+    } else {
+        NSAssert(false, @"invalid address: %@", address);
+        addr = nil;
     }
+    // TODO: other types of address
     NSAssert(addr, @"invalid address: %@", address);
     return addr;
 }
 
 @end
-
-void DIMRegisterAddressFactory(void) {
-    AddressFactory *factory = [[AddressFactory alloc] init];
-    MKMAddressSetFactory(factory);
-}

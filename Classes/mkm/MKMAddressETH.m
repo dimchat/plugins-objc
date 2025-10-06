@@ -87,20 +87,9 @@ static inline BOOL is_eth(NSString *address) {
 
 @implementation MKMAddressETH
 
+// Override
 - (MKMEntityType)network {
     return MKMEntityType_User;
-}
-
-- (BOOL)isBroadcast {
-    return NO;
-}
-
-- (BOOL)isUser {
-    return YES;
-}
-
-- (BOOL)isGroup {
-    return NO;
 }
 
 #pragma mark Coding

@@ -39,14 +39,6 @@
 
 #import "MKMMetaDefault.h"
 
-@interface MKMMetaDefault () {
-    
-    // caches
-    NSMutableDictionary<NSNumber *, MKMAddressBTC *> *_cachedAddresses;
-}
-
-@end
-
 @implementation MKMMetaDefault
 
 /* designated initializer */
@@ -71,13 +63,21 @@
     return self;
 }
 
+// Override
+- (BOOL)hasSeed {
+    return YES;
+}
+
+// Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
     NSAssert(self.type == MKMMetaType_MKM, @"meta version error: %@", self.type);
     // check caches
     MKMAddressBTC *address = [_cachedAddresses objectForKey:@(network)];
     if (!address) {
         // generate and cache it
-        address = [MKMAddressBTC generate:self.fingerprint type:network];
+        NSData *data = [self fingerprint];
+        NSAssert([data length] > 0, @"meta.fingerprint empty");
+        address = [MKMAddressBTC generate:data type:network];
         [_cachedAddresses setObject:address forKey:@(network)];
     }
     return address;

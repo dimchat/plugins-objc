@@ -54,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MKMMetaDefault : DIMMeta
 
+// caches
+@property (strong, nonatomic) NSMutableDictionary<NSNumber *, id<MKMAddress>> *cachedAddresses;
+
 @end
 
 NS_ASSUME_NONNULL_END

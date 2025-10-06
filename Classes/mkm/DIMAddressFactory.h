@@ -45,28 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMAddressFactory : NSObject <MKMAddressFactory>
 
-@end
+// protected
+@property (strong, nonatomic) NSMutableDictionary<NSString *, id<MKMAddress>> *addresses;
 
-@interface DIMAddressFactory (Thanos)
-
-/**
- * Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
- * this will remove 50% of cached objects
- *
- * @return number of survivors
- */
-- (NSUInteger)reduceMemory;
+// protected
+- (nullable __kindof id<MKMAddress>)parse:(NSString *)address;
 
 @end
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void DIMRegisterAddressFactory(void);
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 NS_ASSUME_NONNULL_END

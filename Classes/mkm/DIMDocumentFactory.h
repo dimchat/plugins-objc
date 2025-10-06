@@ -45,20 +45,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMDocumentFactory : NSObject <MKMDocumentFactory>
 
+// protected
 @property (readonly, strong, nonatomic) NSString *type;
 
 - (instancetype)initWithType:(NSString *)type;
 
+// protected
+- (NSString *)getType:(NSString *)type forID:(id<MKMID>)ID;
+
 @end
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void DIMRegisterDocumentFactory(void);
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 NS_ASSUME_NONNULL_END

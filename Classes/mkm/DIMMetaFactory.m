@@ -50,6 +50,7 @@
     return self;
 }
 
+// Override
 - (id<MKMMeta>)createMetaWithKey:(id<MKVerifyKey>)PK
                             seed:(nullable NSString *)name
                      fingerprint:(nullable id<MKTransportableData>)CT {
@@ -68,6 +69,7 @@
     return meta;
 }
 
+// Override
 - (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK
                               seed:(nullable NSString *)name {
     id<MKTransportableData> CT;
@@ -81,7 +83,10 @@
     return [self createMetaWithKey:PK seed:name fingerprint:CT];
 }
 
+// Override
 - (nullable id<MKMMeta>)parseMeta:(NSDictionary *)info {
+    // check 'type', 'key', 'seed', 'fingerprint'
+    // ...
     id<MKMMeta> meta = nil;
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *version = [ext.helper getMetaType:info defaultValue:nil];
@@ -99,16 +104,3 @@
 }
 
 @end
-
-void DIMRegisterMetaFactory(void) {
-    MKMMetaSetFactory(MKMMetaType_MKM,
-                      [[DIMMetaFactory alloc] initWithType:MKMMetaType_MKM]);
-    MKMMetaSetFactory(MKMMetaType_BTC,
-                      [[DIMMetaFactory alloc] initWithType:MKMMetaType_BTC]);
-    MKMMetaSetFactory(MKMMetaType_ExBTC,
-                      [[DIMMetaFactory alloc] initWithType:MKMMetaType_ExBTC]);
-    MKMMetaSetFactory(MKMMetaType_ETH,
-                      [[DIMMetaFactory alloc] initWithType:MKMMetaType_ETH]);
-    MKMMetaSetFactory(MKMMetaType_ExETH,
-                      [[DIMMetaFactory alloc] initWithType:MKMMetaType_ExETH]);
-}

@@ -53,6 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MKMMetaETH : DIMMeta
 
+// cache
+@property (strong, nonatomic, nullable) id<MKMAddress> cachedAddress;
+
 @end
 
 NS_ASSUME_NONNULL_END

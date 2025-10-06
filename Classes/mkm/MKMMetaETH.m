@@ -39,14 +39,6 @@
 
 #import "MKMMetaETH.h"
 
-@interface MKMMetaETH () {
-    
-    // cache
-    MKMAddressETH *_cachedAddress;
-}
-
-@end
-
 @implementation MKMMetaETH
 
 /* designated initializer */
@@ -71,6 +63,13 @@
     return self;
 }
 
+// Override
+- (BOOL)hasSeed {
+    return NO;
+    //return [self objectForKey:@"seed"] && [self objectForKey:@"fingerprint"];
+}
+
+// Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
     NSAssert(self.type == MKMMetaType_ETH || self.type == MKMMetaType_ExETH,
              @"meta version error: %@", self.type);
@@ -78,9 +77,11 @@
     MKMAddressETH *address = _cachedAddress;
     if (!address/* || [address type] != network*/) {
         // 64 bytes key data without prefix 0x04
-        NSData *data = [self.publicKey data];
+        id<MKVerifyKey> key = [self publicKey];
+        NSData *data = [key data];
         // generate and cache it
-        _cachedAddress = address = [MKMAddressETH generate:data];
+        address = [MKMAddressETH generate:data];
+        _cachedAddress = address;
     }
     return address;
 }

@@ -45,20 +45,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMMetaFactory : NSObject <MKMMetaFactory>
 
-@property (readonly, nonatomic) NSString *type;
+// protected
+@property (readonly, strong, nonatomic) NSString *type;
 
 - (instancetype)initWithType:(NSString *)version;
 
 @end
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void DIMRegisterMetaFactory(void);
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 NS_ASSUME_NONNULL_END

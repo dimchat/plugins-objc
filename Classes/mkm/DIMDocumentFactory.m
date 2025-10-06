@@ -39,18 +39,6 @@
 
 #import "DIMDocumentFactory.h"
 
-static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
-    if ([docType isEqualToString:@"*"]) {
-        if ([ID isGroup]) {
-            return MKMDocumentType_Bulletin;
-        } else if ([ID isUser]) {
-            return MKMDocumentType_Visa;
-        }
-        return MKMDocumentType_Profile;
-    }
-    return docType;
-}
-
 @implementation DIMDocumentFactory
 
 - (instancetype)initWithType:(NSString *)type {
@@ -60,10 +48,23 @@ static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
     return self;
 }
 
+- (NSString *)getType:(NSString *)type forID:(id<MKMID>)ID {
+    if (![type isEqualToString:@"*"]) {
+        return type;
+    } else if ([ID isGroup]) {
+        return MKMDocumentType_Bulletin;
+    } else if ([ID isUser]) {
+        return MKMDocumentType_Visa;
+    } else {
+        return MKMDocumentType_Profile;
+    }
+}
+
+// Override
 - (id<MKMDocument>)createDocument:(id<MKMID>)ID
                              data:(nullable NSString *)json
                         signature:(nullable id<MKTransportableData>)CT {
-    NSString *type = doc_type(_type, ID);
+    NSString *type = [self getType:_type forID:ID];
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {
             return [[DIMVisa alloc] initWithID:ID data:json signature:CT];
@@ -84,16 +85,24 @@ static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
     }
 }
 
+// Override
 - (nullable id<MKMDocument>)parseDocument:(NSDictionary *)doc {
     id<MKMID> ID = MKMIDParse([doc objectForKey:@"ID"]);
     if (!ID) {
         NSAssert(false, @"document ID not found: %@", doc);
         return nil;
+    } else if ([doc objectForKey:@"data"] && [doc objectForKey:@"signature"]) {
+        // OK
+    } else {
+        // doc.data should not be empty
+        // doc.signature should not be empty
+        NSAssert(false, @"document error: %@", doc);
+        return nil;
     }
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *type = [ext.helper getDocumentType:doc defaultValue:nil];
     if (!type) {
-        type = doc_type(@"*", ID);
+        type = [self getType:@"I" forID:ID];
     }
     if ([type isEqualToString:MKMDocumentType_Visa]) {
         return [[DIMVisa alloc] initWithDictionary:doc];
@@ -105,14 +114,3 @@ static inline NSString *doc_type(NSString *docType, id<MKMID> ID) {
 }
 
 @end
-
-void DIMRegisterDocumentFactory(void) {
-    MKMDocumentSetFactory(@"*",
-                          [[DIMDocumentFactory alloc] initWithType:@"*"]);
-    MKMDocumentSetFactory(MKMDocumentType_Visa,
-                          [[DIMDocumentFactory alloc] initWithType:MKMDocumentType_Visa]);
-    MKMDocumentSetFactory(MKMDocumentType_Profile,
-                          [[DIMDocumentFactory alloc] initWithType:MKMDocumentType_Profile]);
-    MKMDocumentSetFactory(MKMDocumentType_Bulletin,
-                          [[DIMDocumentFactory alloc] initWithType:MKMDocumentType_Bulletin]);
-}

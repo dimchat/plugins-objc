@@ -59,13 +59,6 @@ static inline NSString *concat(NSString *name,
     }
 }
 
-@interface DIMIDFactory () {
-    
-    NSMutableDictionary<NSString *, id<MKMID>> *_identifiers;
-}
-
-@end
-
 @implementation DIMIDFactory
 
 - (instancetype)init {
@@ -75,6 +68,7 @@ static inline NSString *concat(NSString *name,
     return self;
 }
 
+// Override
 - (id<MKMID>)generateIdentifier:(MKMEntityType)network
                        withMeta:(id<MKMMeta>)meta
                        terminal:(nullable NSString *)locater {
@@ -83,6 +77,7 @@ static inline NSString *concat(NSString *name,
     return MKMIDCreate(meta.seed, address, locater);
 }
 
+// Override
 - (id<MKMID>)createIdentifierWithName:(NSString *)name
                               address:(id<MKMAddress>)address
                              terminal:(NSString *)location {

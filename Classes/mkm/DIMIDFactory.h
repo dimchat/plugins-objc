@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMIDFactory : NSObject <MKMIDFactory>
 
+// protected
+@property (strong, nonatomic) NSMutableDictionary<NSString *, id<MKMID>> *identifiers;
+
 // protected, override for customized ID
 - (id<MKMID>)newID:(NSString *)identifier
               name:(nullable NSString *)seed
@@ -55,27 +58,5 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id<MKMID>)parse:(NSString *)identifier;
 
 @end
-
-@interface DIMIDFactory (Thanos)
-
-/**
- * Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
- * this will remove 50% of cached objects
- *
- * @return number of survivors
- */
-- (NSUInteger)reduceMemory;
-
-@end
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void DIMRegisterIDFactory(void);
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 NS_ASSUME_NONNULL_END
