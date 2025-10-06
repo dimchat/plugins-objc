@@ -244,3 +244,58 @@ static inline NSData *random_data(NSUInteger size) {
 }
 
 @end
+
+#pragma mark -
+
+@implementation DIMPlainKey
+
+static DIMPlainKey *s_sharedPlainKey = nil;
+
++ (instancetype)sharedInstance {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (!s_sharedPlainKey) {
+            s_sharedPlainKey = [[DIMPlainKey alloc] init];
+        }
+    });
+    return s_sharedPlainKey;
+}
+
+- (instancetype)init {
+    NSDictionary *dict = @{@"algorithm": MKSymmetricAlgorithm_Plain};
+    if (self = [super initWithDictionary:dict]) {
+        //
+    }
+    return self;
+}
+
+// Override
+- (NSData *)data {
+    return nil;
+}
+
+// Override
+- (NSData *)encrypt:(NSData *)plaintext
+              extra:(nullable NSMutableDictionary<NSString *,id> *)params {
+    return plaintext;
+}
+
+// Override
+- (nullable NSData *)decrypt:(NSData *)ciphertext
+                      params:(nullable NSDictionary<NSString *,id> *)extra {
+    return ciphertext;
+}
+
+@end
+
+@implementation DIMPlainKeyFactory
+
+- (id<MKSymmetricKey>)generateSymmetricKey {
+    return [DIMPlainKey sharedInstance];
+}
+
+- (nullable id<MKSymmetricKey>)parseSymmetricKey:(NSDictionary *)key {
+    return [DIMPlainKey sharedInstance];
+}
+
+@end

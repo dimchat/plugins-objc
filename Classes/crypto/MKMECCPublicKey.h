@@ -39,16 +39,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
-*  ECC Public Key
-*
-*      keyInfo format : {
-*          algorithm  : "ECC",
-*          curve      : "secp256k1",
-*          data       : "...", // base64_encode(),
-*          compressed : 0
-*      }
-*/
+/**
+ *  ECC Public Key
+ *
+ *      keyInfo format : {
+ *          algorithm  : "ECC",
+ *          curve      : "secp256k1",
+ *          data       : "...", // base64_encode(),
+ *          compressed : 0
+ *      }
+ */
 @interface DIMECCPublicKey : DIMPublicKey
 
 @property (readonly, nonatomic) BOOL compressed;

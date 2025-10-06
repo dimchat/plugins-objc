@@ -39,6 +39,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void DIMRegisterDataCoders(void);
+@interface DIMHexCoder : NSObject <MKDataCoder>
+
+@end
+
+@interface DIMBase58Coder : NSObject <MKDataCoder>
+
+@end
+
+@interface DIMBase64Coder : NSObject <MKDataCoder>
+
+@end
 
 NS_ASSUME_NONNULL_END

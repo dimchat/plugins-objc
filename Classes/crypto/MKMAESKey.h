@@ -39,7 +39,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
+/**
  *  AES Key
  *
  *      keyInfo format: {
@@ -56,6 +56,27 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface DIMAESKeyFactory : NSObject <MKSymmetricKeyFactory>
+
+@end
+
+#pragma mark -
+
+/**
+ *  Symmetric key for broadcast message,
+ *  which will do nothing when en/decoding message data
+ *
+ *      keyInfo forma t: {
+ *          algorithm : "PLAIN",
+ *          data      : ""       // empty data
+ *      }
+ */
+@interface DIMPlainKey : DIMSymmetricKey
+
++ (instancetype)sharedInstance;
+
+@end
+
+@interface DIMPlainKeyFactory : NSObject <MKSymmetricKeyFactory>
 
 @end
 

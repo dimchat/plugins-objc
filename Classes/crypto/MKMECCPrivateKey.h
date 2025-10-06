@@ -39,15 +39,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
-*  ECC Private Key
-*
-*      keyInfo format : {
-*          algorithm  : "ECC",
-*          curve      : "secp256k1",
-*          data       : "..." // base64_encode()
-*      }
-*/
+/**
+ *  ECC Private Key
+ *
+ *      keyInfo format : {
+ *          algorithm  : "ECC",
+ *          curve      : "secp256k1",
+ *          data       : "..." // base64_encode()
+ *      }
+ */
 @interface DIMECCPrivateKey : DIMPrivateKey
 
 + (instancetype)newKey;

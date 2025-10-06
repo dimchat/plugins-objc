@@ -39,10 +39,6 @@
 
 #import "DIMDataCoders.h"
 
-@interface Hex : NSObject <MKDataCoder>
-
-@end
-
 static inline char hex_char(char ch) {
     if (ch >= '0' && ch <= '9') {
         return ch - '0';
@@ -56,8 +52,9 @@ static inline char hex_char(char ch) {
     return 0;
 }
 
-@implementation Hex
+@implementation DIMHexCoder
 
+// Override
 - (NSString *)encode:(NSData *)data {
     NSMutableString *output = nil;
     
@@ -71,6 +68,7 @@ static inline char hex_char(char ch) {
     return output;
 }
 
+// Override
 - (nullable NSData *)decode:(NSString *)string {
     NSMutableData *output = nil;
     
@@ -108,12 +106,9 @@ static inline char hex_char(char ch) {
 
 @end
 
-@interface Base58 : NSObject <MKDataCoder>
+@implementation DIMBase58Coder
 
-@end
-
-@implementation Base58
-
+// Override
 - (NSString *)encode:(NSData *)data {
     NSString *output = nil;
     const unsigned char *pbegin = (const unsigned char *)[data bytes];
@@ -124,6 +119,7 @@ static inline char hex_char(char ch) {
     return output;
 }
 
+// Override
 - (nullable NSData *)decode:(NSString *)string {
     NSData *output = nil;
     const char *cstr = [string cStringUsingEncoding:NSUTF8StringEncoding];
@@ -136,18 +132,16 @@ static inline char hex_char(char ch) {
 
 @end
 
-@interface Base64 : NSObject <MKDataCoder>
+@implementation DIMBase64Coder
 
-@end
-
-@implementation Base64
-
+// Override
 - (NSString *)encode:(NSData *)data {
     NSDataBase64EncodingOptions opt;
     opt = NSDataBase64EncodingEndLineWithCarriageReturn;
     return [data base64EncodedStringWithOptions:opt];
 }
 
+// Override
 - (nullable NSData *)decode:(NSString *)string {
     NSDataBase64DecodingOptions opt;
     opt = NSDataBase64DecodingIgnoreUnknownCharacters;
@@ -155,18 +149,3 @@ static inline char hex_char(char ch) {
 }
 
 @end
-
-void DIMRegisterDataCoders(void) {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if ([MKHex getCoder] == nil) {
-            [MKHex setCoder:[[Hex alloc] init]];
-        }
-        if ([MKBase58 getCoder] == nil) {
-            [MKBase58 setCoder:[[Base58 alloc] init]];
-        }
-        if ([MKBase64 getCoder] == nil) {
-            [MKBase64 setCoder:[[Base64 alloc] init]];
-        }
-    });
-}

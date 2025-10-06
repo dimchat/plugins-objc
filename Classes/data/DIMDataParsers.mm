@@ -37,51 +37,14 @@
 
 #import "DIMDataParsers.h"
 
-@interface JSON : NSObject <MKObjectCoder>
+@implementation DIMUTF8Coder
 
-@end
-
-@implementation JSON
-
-- (NSString *)encode:(id)container {
-    if (![NSJSONSerialization isValidJSONObject:container]) {
-        NSAssert(false, @"object format not support for json: %@", container);
-        return nil;
-    }
-    static NSJSONWritingOptions opt = NSJSONWritingSortedKeys;
-    NSError *error = nil;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:container
-                                                   options:opt
-                                                     error:&error];
-    NSAssert(!error, @"JSON encode error: %@", error);
-    return [[NSString alloc] initWithData:data
-                                 encoding:NSUTF8StringEncoding];
-}
-
-- (nullable id)decode:(NSString *)json {
-    static NSJSONReadingOptions opt = NSJSONReadingAllowFragments;
-    //static NSJSONReadingOptions opt = NSJSONReadingMutableContainers;
-    NSError *error = nil;
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
-    id obj = [NSJSONSerialization JSONObjectWithData:data
-                                             options:opt
-                                               error:&error];
-    //NSAssert(!error, @"JSON decode error: %@", error);
-    return obj;
-}
-
-@end
-
-@interface UTF8 : NSObject <MKStringCoder>
-
-@end
-
-@implementation UTF8
-
+// Override
 - (NSData *)encode:(NSString *)string {
     return [string dataUsingEncoding:NSUTF8StringEncoding];
 }
 
+// Override
 - (nullable NSString *)decode:(NSData *)data {
     const unsigned char *bytes = (const unsigned char *)[data bytes];
     // rtrim '\0'
@@ -97,14 +60,35 @@
 
 @end
 
-void DIMRegisterDataParsers(void) {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if ([MKJSON getCoder] == nil) {
-            [MKJSON setCoder:[[JSON alloc] init]];
-        }
-        if ([MKUTF8 getCoder] == nil) {
-            [MKUTF8 setCoder:[[UTF8 alloc] init]];
-        }
-    });
+@implementation DIMJSONCoder
+
+// Override
+- (NSString *)encode:(id)container {
+    if (![NSJSONSerialization isValidJSONObject:container]) {
+        NSAssert(false, @"object format not support for json: %@", container);
+        return nil;
+    }
+    static NSJSONWritingOptions opt = NSJSONWritingSortedKeys;
+    NSError *error = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:container
+                                                   options:opt
+                                                     error:&error];
+    NSAssert(!error, @"JSON encode error: %@", error);
+    return [[NSString alloc] initWithData:data
+                                 encoding:NSUTF8StringEncoding];
 }
+
+// Override
+- (nullable id)decode:(NSString *)json {
+    static NSJSONReadingOptions opt = NSJSONReadingAllowFragments;
+    //static NSJSONReadingOptions opt = NSJSONReadingMutableContainers;
+    NSError *error = nil;
+    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
+    id obj = [NSJSONSerialization JSONObjectWithData:data
+                                             options:opt
+                                               error:&error];
+    //NSAssert(!error, @"JSON decode error: %@", error);
+    return obj;
+}
+
+@end

@@ -39,6 +39,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface DIMBaseNetworkFile : MKDictionary <MKPortableNetworkFile>
+
+- (instancetype)initWithData:(nullable id<MKTransportableData>)data
+                    filename:(nullable NSString *)name
+                         url:(nullable NSURL *)locator
+                    password:(nullable id<MKDecryptKey>)key;
+
+@end
+
 @interface DIMBaseFileFactory : NSObject <MKPortableNetworkFileFactory>
 
 @end

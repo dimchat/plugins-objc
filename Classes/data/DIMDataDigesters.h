@@ -39,6 +39,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void DIMRegisterDataDigesters(void);
+@interface DIMSHA256Digester : NSObject <MKMessageDigester>
+
+@end
+
+@interface DIMKECCAK256Digester : NSObject <MKMessageDigester>
+
+@end
+
+@interface DIMRIPEMD160Digester : NSObject <MKMessageDigester>
+
+@end
 
 NS_ASSUME_NONNULL_END

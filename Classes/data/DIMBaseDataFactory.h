@@ -39,6 +39,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface DIMBase64Data : MKDictionary <MKTransportableData>
+
+- (instancetype)initWithData:(NSData *)binary;
+
+- (NSString *)encode:(NSString *)mimeType;
+
+@end
+
 @interface DIMBase64DataFactory : NSObject <MKTransportableDataFactory>
 
 @end

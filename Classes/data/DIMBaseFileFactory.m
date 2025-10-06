@@ -39,19 +39,14 @@
 
 #import "DIMBaseFileFactory.h"
 
-@interface BaseNetworkFile : MKDictionary <MKPortableNetworkFile> {
+@interface DIMBaseNetworkFile() {
     
     DIMBaseFileWrapper *_wrapper;
 }
 
-- (instancetype)initWithData:(nullable id<MKTransportableData>)data
-                    filename:(nullable NSString *)name
-                         url:(nullable NSURL *)locator
-                    password:(nullable id<MKDecryptKey>)key;
-
 @end
 
-@implementation BaseNetworkFile
+@implementation DIMBaseNetworkFile
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
@@ -94,38 +89,47 @@
     return self;
 }
 
+// Override
 - (NSData *)data {
     return [_wrapper.data data];
 }
 
+// Override
 - (void)setData:(NSData *)data {
     [_wrapper setBinary:data];
 }
 
+// Override
 - (NSString *)filename {
     return [_wrapper filename];
 }
 
+// Override
 - (void)setFilename:(NSString *)filename {
     [_wrapper setFilename:filename];
 }
 
+// Override
 - (NSURL *)URL {
-    return [_wrapper URL];;
+    return [_wrapper URL];
 }
 
+// Override
 - (void)setURL:(NSURL *)url {
     [_wrapper setURL:url];
 }
 
+// Override
 - (id<MKDecryptKey>)password {
     return [_wrapper password];
 }
 
+// Override
 - (void)setPassword:(id<MKDecryptKey>)password {
     [_wrapper setPassword:password];
 }
 
+// Override
 - (NSString *)string {
     NSString *urlString = [self _urlString];
     if (urlString) {
@@ -136,6 +140,7 @@
     return MKJsonMapEncode([self dictionary]);
 }
 
+// Override
 - (NSObject *)object {
     NSString *urlString = [self _urlString];
     if (urlString) {
@@ -168,14 +173,14 @@
                                               filename:(NSString *)name
                                                    url:(NSURL *)locator
                                               password:(id<MKDecryptKey>)key {
-    return [[BaseNetworkFile alloc] initWithData:data
-                                        filename:name
-                                             url:locator
-                                        password:key];
+    return [[DIMBaseNetworkFile alloc] initWithData:data
+                                           filename:name
+                                                url:locator
+                                           password:key];
 }
 
 - (id<MKPortableNetworkFile>)parsePortableNetworkFile:(NSDictionary *)pnf {
-    return [[BaseNetworkFile alloc] initWithDictionary:pnf];
+    return [[DIMBaseNetworkFile alloc] initWithDictionary:pnf];
 }
 
 @end

@@ -39,18 +39,14 @@
 
 #import "DIMBaseDataFactory.h"
 
-@interface Base64Data : MKDictionary <MKTransportableData> {
+@interface DIMBase64Data() {
     
     DIMBaseDataWrapper *_wrapper;
 }
 
-- (instancetype)initWithData:(NSData *)binary;
-
-- (NSString *)encode:(NSString *)mimeType;
-
 @end
 
-@implementation Base64Data
+@implementation DIMBase64Data
 
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
@@ -80,18 +76,22 @@
     return self;
 }
 
+// Override
 - (NSString *)algorithm {
     return [_wrapper algorithm];
 }
 
+// Override
 - (NSData *)data {
     return [_wrapper data];
 }
 
+// Override
 - (NSObject *)object {
     return [self string];
 }
 
+// Override
 - (NSString *)string {
     // 0. "{BASE64_ENCODE}"
     // 1. "base64,{BASE64_ENCODE}"
@@ -109,14 +109,22 @@
 
 @implementation DIMBase64DataFactory
 
+// Override
 - (id<MKTransportableData>)createTransportableData:(NSData *)data {
-    return [[Base64Data alloc] initWithData:data];
+    return [[DIMBase64Data alloc] initWithData:data];
 }
 
+// Override
 - (nullable id<MKTransportableData>)parseTransportableData:(NSDictionary *)ted {
+    // check 'data'
+    if ([ted objectForKey:@"data"] == nil) {
+        // key.data should not be empty
+        NSAssert(false, @"TED error: %@", ted);
+        return nil;
+    }
     // TODO: 1. check algorithm
     //       2. check data format
-    return [[Base64Data alloc] initWithDictionary:ted];
+    return [[DIMBase64Data alloc] initWithDictionary:ted];
 }
 
 @end

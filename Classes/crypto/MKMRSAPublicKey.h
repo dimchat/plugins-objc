@@ -39,7 +39,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
+/**
  *  RSA Public Key
  *
  *      keyInfo format : {

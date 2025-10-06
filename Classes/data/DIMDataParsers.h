@@ -39,6 +39,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void DIMRegisterDataParsers(void);
+@interface DIMUTF8Coder : NSObject <MKStringCoder>
+
+@end
+
+@interface DIMJSONCoder : NSObject <MKObjectCoder>
+
+@end
 
 NS_ASSUME_NONNULL_END
