@@ -35,9 +35,9 @@
 //  Copyright © 2023 DIM Group. All rights reserved.
 //
 
-#import "MKMMetaDefault.h"
-#import "MKMMetaBTC.h"
-#import "MKMMetaETH.h"
+#import "DIMDefaultMeta.h"
+#import "DIMBTCMeta.h"
+#import "DIMETHMeta.h"
 
 #import "DIMMetaFactory.h"
 
@@ -57,11 +57,11 @@
     id<MKMMeta> meta;
     NSString *version = _type;
     if ([version isEqualToString:MKMMetaType_MKM]) {
-        meta = [[MKMMetaDefault alloc] initWithType:version key:PK seed:name fingerprint:CT];
+        meta = [[DIMDefaultMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
     } else if ([version isEqualToString:MKMMetaType_BTC]) {
-        meta = [[MKMMetaBTC alloc] initWithType:version key:PK seed:name fingerprint:CT];
+        meta = [[DIMBTCMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
     } else if ([version isEqualToString:MKMMetaType_ETH]) {
-        meta = [[MKMMetaETH alloc] initWithType:version key:PK seed:name fingerprint:CT];
+        meta = [[DIMETHMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
     } else {
         NSAssert(false, @"meta type not supported: %@", version);
         meta = nil;
@@ -91,11 +91,11 @@
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *version = [ext.helper getMetaType:info defaultValue:nil];
     if ([version isEqualToString:MKMMetaType_MKM]) {
-        meta = [[MKMMetaDefault alloc] initWithDictionary:info];
+        meta = [[DIMDefaultMeta alloc] initWithDictionary:info];
     } else if ([version isEqualToString:MKMMetaType_BTC]) {
-        meta = [[MKMMetaBTC alloc] initWithDictionary:info];
+        meta = [[DIMBTCMeta alloc] initWithDictionary:info];
     } else if ([version isEqualToString:MKMMetaType_ETH]) {
-        meta = [[MKMMetaETH alloc] initWithDictionary:info];
+        meta = [[DIMETHMeta alloc] initWithDictionary:info];
     } else {
         NSAssert(false, @"meta type not supported: %@", version);
         meta = nil;

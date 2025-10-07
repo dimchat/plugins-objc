@@ -57,32 +57,49 @@ FOUNDATION_EXPORT const unsigned char DIMPluginsVersionString[];
 #define __DIM_SDK__ 1
 
 // Crypto
-#import <DIMPlugins/MKMAESKey.h>
-#import <DIMPlugins/MKMSecKeyHelper.h>
-#import <DIMPlugins/MKMECCPublicKey.h>
-#import <DIMPlugins/MKMECCPrivateKey.h>
-#import <DIMPlugins/MKMRSAPublicKey.h>
-#import <DIMPlugins/MKMRSAPrivateKey.h>
-#import <DIMPlugins/MKMPrivateKey+Store.h>
+#import <DIMPlugins/DIMAESKey.h>
+#import <DIMPlugins/DIMPlainKey.h>
+#import <DIMPlugins/DIMSecKeyHelper.h>
+#import <DIMPlugins/DIMECCPublicKey.h>
+#import <DIMPlugins/DIMECCPrivateKey.h>
+#import <DIMPlugins/DIMRSAPublicKey.h>
+#import <DIMPlugins/DIMRSAPrivateKey.h>
+#import <DIMPlugins/DIMPrivateKey+Store.h>
 
 // Data
-#import <DIMPlugins/DIMDataDigesters.h>
+#import <DIMPlugins/DIMDigesters.h>
 #import <DIMPlugins/DIMDataCoders.h>
 #import <DIMPlugins/DIMDataParsers.h>
-#import <DIMPlugins/DIMBaseDataFactory.h>
-#import <DIMPlugins/DIMBaseFileFactory.h>
+#import <DIMPlugins/DIMBase64Data.h>
+#import <DIMPlugins/DIMBaseNetworkFile.h>
 
 // MingKeMing
 #import <DIMPlugins/DIMAddressFactory.h>
 #import <DIMPlugins/DIMIDFactory.h>
 #import <DIMPlugins/DIMMetaFactory.h>
 #import <DIMPlugins/DIMDocumentFactory.h>
-#import <DIMPlugins/MKMAddressBTC.h>
-#import <DIMPlugins/MKMAddressETH.h>
-#import <DIMPlugins/MKMMetaDefault.h>
-#import <DIMPlugins/MKMMetaBTC.h>
-#import <DIMPlugins/MKMMetaETH.h>
+#import <DIMPlugins/DIMBTCAddress.h>
+#import <DIMPlugins/DIMETHAddress.h>
+#import <DIMPlugins/DIMDefaultMeta.h>
+#import <DIMPlugins/DIMBTCMeta.h>
+#import <DIMPlugins/DIMETHMeta.h>
 
-#import <DIMPlugins/MKMPlugins.h>
+// DaoKeDao
+
+#import <DIMPlugins/DIMGeneralCommandFactory.h>
+#import <DIMPlugins/DIMHistoryCommandFactory.h>
+#import <DIMPlugins/DIMGroupCommandFactory.h>
+#import <DIMPlugins/DIMMessageFactory.h>
+
+// extension
+
+#import <DIMPlugins/DIMCryptoKeyGeneralFactory.h>
+#import <DIMPlugins/DIMFormatGeneralFactory.h>
+#import <DIMPlugins/DIMAccountGeneralFactory.h>
+#import <DIMPlugins/DIMCommandGeneralFactory.h>
+#import <DIMPlugins/DIMMessageGeneralFactory.h>
+
+#import <DIMPlugins/DIMExtensionLoader.h>
+#import <DIMPlugins/DIMPluginLoader.h>
 
 #endif /* ! __DIM_SDK__== */

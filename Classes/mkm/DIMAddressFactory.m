@@ -37,8 +37,8 @@
 
 #import <DIMCore/DIMCore.h>
 
-#import "MKMAddressBTC.h"
-#import "MKMAddressETH.h"
+#import "DIMBTCAddress.h"
+#import "DIMETHAddress.h"
 
 #import "DIMAddressFactory.h"
 
@@ -80,24 +80,24 @@
         return nil;
     } else if (len == 8) {
         // "anywhere"
-        res = [MKMAnywhere().string caseInsensitiveCompare:address];
+        res = [MKMAnywhere.string caseInsensitiveCompare:address];
         if (res == NSOrderedSame) {
-            return MKMAnywhere();
+            return MKMAnywhere;
         }
     } else if (len == 10) {
         // "everywhere"
-        res = [MKMEverywhere().string caseInsensitiveCompare:address];
+        res = [MKMEverywhere.string caseInsensitiveCompare:address];
         if (res == NSOrderedSame) {
-            return MKMEverywhere();
+            return MKMEverywhere;
         }
     }
     id<MKMAddress> addr;
     if (26 <= len && len <= 35) {
         // BTC
-        addr = [MKMAddressBTC parse:address];
+        addr = [DIMBTCAddress parse:address];
     } else if (len == 42) {
         // ETH
-        addr = [MKMAddressETH parse:address];
+        addr = [DIMETHAddress parse:address];
     } else {
         NSAssert(false, @"invalid address: %@", address);
         addr = nil;

@@ -41,24 +41,6 @@
 
 #import "DIMIDFactory.h"
 
-static inline NSString *concat(NSString *name,
-                               id<MKMAddress> address,
-                               NSString *terminal) {
-    NSUInteger len1 = [name length];
-    NSUInteger len2 = [terminal length];
-    if (len1 > 0) {
-        if (len2 > 0) {
-            return [NSString stringWithFormat:@"%@@%@/%@", name, [address string], terminal];
-        } else {
-            return [NSString stringWithFormat:@"%@@%@", name, [address string]];
-        }
-    } else if (len2 > 0) {
-        return [NSString stringWithFormat:@"%@/%@", [address string], terminal];
-    } else {
-        return [address string];
-    }
-}
-
 @implementation DIMIDFactory
 
 - (instancetype)init {
@@ -81,7 +63,7 @@ static inline NSString *concat(NSString *name,
 - (id<MKMID>)createIdentifierWithName:(NSString *)name
                               address:(id<MKMAddress>)address
                              terminal:(NSString *)location {
-    NSString *string = concat(name, address, location);
+    NSString *string = MKMIDConcat(name, address, location);
     id<MKMID> ID = [_identifiers objectForKey:string];
     if (!ID) {
         ID = [self newID:string name:name address:address terminal:location];
