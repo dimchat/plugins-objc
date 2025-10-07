@@ -86,10 +86,8 @@ FOUNDATION_EXPORT const unsigned char DIMPluginsVersionString[];
 
 // DaoKeDao
 
-#import <DIMPlugins/DIMGeneralCommandFactory.h>
-#import <DIMPlugins/DIMHistoryCommandFactory.h>
-#import <DIMPlugins/DIMGroupCommandFactory.h>
-#import <DIMPlugins/DIMMessageFactory.h>
+#import <DIMPlugins/DIMCommandFactories.h>
+#import <DIMPlugins/DIMMessageFactories.h>
 
 // extension
 
