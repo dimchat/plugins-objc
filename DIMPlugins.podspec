@@ -8,21 +8,21 @@
 
 Pod::Spec.new do |s|
     s.name                  = 'DIMPlugins'
-    s.version               = '1.0.0'
-    s.summary               = 'Decentralized Instant Messaging'
+    s.version               = '1.0.1'
+    s.summary               = 'Decentralized Instant Messaging Plugins'
     s.description           = <<-DESC
-            Decentralized Instant Messaging (Objective-C SDK)
+            Decentralized Instant Messaging (Objective-C Plugins)
                               DESC
-    s.homepage              = 'https://github.com/dimchat/sdk-objc'
+    s.homepage              = 'https://github.com/dimchat/plugins-objc'
     s.license               = { :type => 'MIT', :file => 'LICENSE' }
     s.author                = { 'Albert Moky' => 'albert.moky@gmail.com' }
-    s.source                = { :git => 'https://github.com/dimchat/sdk-objc.git', :tag => s.version.to_s }
+    s.source                = { :git => 'https://github.com/dimchat/plugins-objc.git', :tag => s.version.to_s }
     # s.platform            = :ios, "12.0"
     s.ios.deployment_target = '12.0'
 
-    s.source_files          = 'Classes', 'DIMPlugins/*.h', 'Classes/**/*.{h,inc,m,mm,c,cpp}'
+    s.source_files          = 'Classes', 'DIMPlugins/DIMPlugins/*.h', 'Classes/**/*.{h,inc,m,mm,c,cpp}'
     # s.exclude_files       = 'DIMPlugins/Classes/Exclude'
-    s.public_header_files   = 'DIMPlugins/*.h', 'Classes/*.h', 'Classes/crypto/*.h', 'Classes/data/*.h', 'Classes/mkm/*.h', 'Classes/dkd/*.h', 'Classes/extends/*.h'
+    s.public_header_files   = 'DIMPlugins/DIMPlugins/*.h', 'Classes/*.h', 'Classes/crypto/*.h', 'Classes/data/*.h', 'Classes/mkm/*.h', 'Classes/dkd/*.h', 'Classes/extends/*.h'
 
     s.frameworks            = 'Security'
     # s.requires_arc        = true
