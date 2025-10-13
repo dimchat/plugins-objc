@@ -87,7 +87,7 @@
 
 // Override
 - (nullable id<MKMDocument>)parseDocument:(NSDictionary *)doc {
-    id<MKMID> ID = MKMIDParse([doc objectForKey:@"ID"]);
+    id<MKMID> ID = MKMIDParse([doc objectForKey:@"did"]);
     if (!ID) {
         NSAssert(false, @"document ID not found: %@", doc);
         return nil;

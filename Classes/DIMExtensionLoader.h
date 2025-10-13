@@ -34,7 +34,7 @@
 //  Created by Albert Moky on 2025/10/8.
 //
 
-#import <Foundation/Foundation.h>
+#import <DIMCore/DIMCore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

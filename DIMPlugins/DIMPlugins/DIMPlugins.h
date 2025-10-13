@@ -53,8 +53,8 @@ FOUNDATION_EXPORT const unsigned char DIMPluginsVersionString[];
 // Core
 //#import <DIMCore/DIMCore.h>
 
-#if !defined(__DIM_SDK__)
-#define __DIM_SDK__ 1
+#if !defined(__DIM_PLUGINS__)
+#define __DIM_PLUGINS__ 1
 
 // Crypto
 #import <DIMPlugins/DIMAESKey.h>
@@ -100,4 +100,4 @@ FOUNDATION_EXPORT const unsigned char DIMPluginsVersionString[];
 #import <DIMPlugins/DIMExtensionLoader.h>
 #import <DIMPlugins/DIMPluginLoader.h>
 
-#endif /* ! __DIM_SDK__== */
+#endif /* ! __DIM_PLUGINS__== */
