@@ -34,11 +34,11 @@
 //  Created by Albert Moky on 2025/10/8.
 //
 
-#import <DIMCore/DIMCore.h>
+#import <DIMCore/Ext.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DIMCommandGeneralFactory : NSObject <DIMGeneralCommandHelper, DKDCommandHelper>
+@interface DIMCommandGeneralFactory : NSObject <DKDGeneralCommandHelper, DKDCommandHelper>
 
 @end
 

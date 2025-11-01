@@ -35,6 +35,9 @@
 //  Copyright © 2023 DIM Group. All rights reserved.
 //
 
+#import <DIMCore/DIMCore.h>
+#import <DIMCore/Ext.h>
+
 #import "DIMDefaultMeta.h"
 #import "DIMBTCMeta.h"
 #import "DIMETHMeta.h"

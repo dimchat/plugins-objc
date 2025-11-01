@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
     s.name                  = 'DIMPlugins'
-    s.version               = '1.0.1'
+    s.version               = '1.0.6'
     s.summary               = 'Decentralized Instant Messaging Plugins'
     s.description           = <<-DESC
             Decentralized Instant Messaging (Objective-C Plugins)
@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
     s.frameworks            = 'Security'
     # s.requires_arc        = true
 
-    s.dependency 'DIMCore', '~> 1.0.5'
-    s.dependency 'DaoKeDao', '~> 1.0.5'
-    s.dependency 'MingKeMing', '~> 1.0.5'
+    s.dependency 'DIMCore', '~> 1.0.6'
+    s.dependency 'DaoKeDao', '~> 1.0.6'
+    s.dependency 'MingKeMing', '~> 1.0.6'
 end

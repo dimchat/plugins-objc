@@ -193,7 +193,12 @@
 		E9FC46FD2E91C15000D15BBE /* Exceptions for "DIMPlugins" folder in "DIMPlugins" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
+				Crypto.h,
+				DaoKeDao.h,
 				DIMPlugins.h,
+				Ext.h,
+				Loader.h,
+				MingKeMing.h,
 			);
 			target = E9FC46EC2E91C15000D15BBE /* DIMPlugins */;
 		};

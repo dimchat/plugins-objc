@@ -119,7 +119,7 @@
 - (void)registerCommandHelpers {
     // cmd
     DIMCommandGeneralFactory *helper = [[DIMCommandGeneralFactory alloc] init];
-    DIMSharedCommandExtensions *ext = [DIMSharedCommandExtensions sharedInstance];
+    DKDSharedCommandExtensions *ext = [DKDSharedCommandExtensions sharedInstance];
     [ext setCmdHelper:helper];
     [ext setHelper:helper];
 }
@@ -225,17 +225,17 @@
 
     // Group Commands
     DIMCommandRegister(@"group", [[DIMGroupCommandFactory alloc] init]);
-    DIMCommandRegisterClass(DIMGroupCommand_Invite, DIMInviteGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Invite, DIMInviteGroupCommand);
     // 'expel' is deprecated (use 'reset' instead)
-    DIMCommandRegisterClass(DIMGroupCommand_Expel, DIMExpelGroupCommand);
-    DIMCommandRegisterClass(DIMGroupCommand_Join, DIMJoinGroupCommand);
-    DIMCommandRegisterClass(DIMGroupCommand_Quit, DIMQuitGroupCommand);
-    //DIMCommandRegisterClass(DIMGroupCommand_Query, DIMQueryGroupCommand);
-    DIMCommandRegisterClass(DIMGroupCommand_Reset, DIMResetGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Expel, DIMExpelGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Join, DIMJoinGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Quit, DIMQuitGroupCommand);
+    //DIMCommandRegisterClass(DKDGroupCommand_Query, DIMQueryGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Reset, DIMResetGroupCommand);
     // Group Admin Commands
-    DIMCommandRegisterClass(DIMGroupCommand_Hire, DIMHireGroupCommand);
-    DIMCommandRegisterClass(DIMGroupCommand_Fire, DIMFireGroupCommand);
-    DIMCommandRegisterClass(DIMGroupCommand_Resign, DIMResignGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Hire, DIMHireGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Fire, DIMFireGroupCommand);
+    DIMCommandRegisterClass(DKDGroupCommand_Resign, DIMResignGroupCommand);
     
 }
 

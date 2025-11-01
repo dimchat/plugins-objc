@@ -133,18 +133,3 @@
 }
 
 @end
-
-@implementation DIMIDFactory (Thanos)
-
-- (NSUInteger)reduceMemory {
-    NSUInteger snap = 0;
-//    snap = DIMThanos(_identifiers, snap);
-    return snap;
-}
-
-@end
-
-void DIMRegisterIDFactory(void) {
-    DIMIDFactory *factory = [[DIMIDFactory alloc] init];
-    MKMIDSetFactory(factory);
-}

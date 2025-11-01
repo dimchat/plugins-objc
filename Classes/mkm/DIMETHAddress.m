@@ -35,6 +35,8 @@
 //  Copyright © 2020 Albert Moky. All rights reserved.
 //
 
+#import <DIMCore/DIMCore.h>
+
 #import "DIMETHAddress.h"
 
 // https://eips.ethereum.org/EIPS/eip-55

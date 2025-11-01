@@ -34,6 +34,8 @@
 //  Created by Albert Moky on 2025/10/8.
 //
 
+#import <DIMCore/DIMCore.h>
+
 #import "DIMMessageGeneralFactory.h"
 
 @interface DIMMessageGeneralFactory () {

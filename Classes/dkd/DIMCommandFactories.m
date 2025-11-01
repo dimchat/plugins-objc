@@ -34,13 +34,15 @@
 //  Created by Albert Moky on 2025/10/8.
 //
 
+#import <DIMCore/Ext.h>
+
 #import "DIMCommandFactories.h"
 
 @implementation DIMGeneralCommandFactory
 
 // Override
 - (nullable __kindof id<DKDContent>)parseContent:(NSDictionary *)content {
-    DIMSharedCommandExtensions *ext = [DIMSharedCommandExtensions sharedInstance];
+    DKDSharedCommandExtensions *ext = [DKDSharedCommandExtensions sharedInstance];
     // get factory by command name
     NSString *cmd = [ext.helper getCmd:content defaultValue:nil];
     id<DKDCommandFactory> factory = nil;
@@ -98,7 +100,7 @@
 
 // Override
 - (nullable __kindof id<DKDContent>)parseContent:(NSDictionary *)content {
-    DIMSharedCommandExtensions *ext = [DIMSharedCommandExtensions sharedInstance];
+    DKDSharedCommandExtensions *ext = [DKDSharedCommandExtensions sharedInstance];
     // get factory by command name
     NSString *cmd = [ext.helper getCmd:content defaultValue:nil];
     id<DKDCommandFactory> factory = nil;

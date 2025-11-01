@@ -34,6 +34,8 @@
 //  Created by Albert Moky on 2025/10/8.
 //
 
+#import <DIMCore/DIMCore.h>
+
 #import "DIMCommandGeneralFactory.h"
 
 @interface DIMCommandGeneralFactory () {
@@ -59,7 +61,7 @@
 
 #pragma mark Command
 
-- (void)setCommandFactory:(id<DKDCommandFactory>)factory forCMD:(NSString *)cmd {
+- (void)setCommandFactory:(id<DKDCommandFactory>)factory cmd:(NSString *)cmd {
     [_commandFactories setObject:factory forKey:cmd];
 }
 

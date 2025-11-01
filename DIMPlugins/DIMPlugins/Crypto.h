@@ -1,13 +1,13 @@
 // license: https://mit-license.org
 //
-//  Ming-Ke-Ming : Decentralized User Identity Authentication
+//  DIM-SDK : Decentralized Instant Messaging Software Development Kit
 //
-//                               Written in 2020 by Moky <albert.moky@gmail.com>
+//                               Written in 2023 by Moky <albert.moky@gmail.com>
 //
 // =============================================================================
 // The MIT License (MIT)
 //
-// Copyright (c) 2020 Albert Moky
+// Copyright (c) 2023 Albert Moky
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,27 +28,33 @@
 // SOFTWARE.
 // =============================================================================
 //
-//  DIMDigesters.h
+//  Crypto.h
 //  DIMPlugins
 //
-//  Created by Albert Moky on 2020/4/7.
-//  Copyright © 2020 DIM Group. All rights reserved.
+//  Created by Albert Moky on 2023/5/17.
 //
 
-#import <MingKeMing/Digest.h>
+// Core
+#import <DIMCore/Crypto.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#if !defined(__DIM_PLUGINS_CRYPTO__)
+#define __DIM_PLUGINS_CRYPTO__ 1
 
-@interface DIMSHA256Digester : NSObject <MKMessageDigester>
+// Keys
+#import <DIMPlugins/DIMAESKey.h>
+#import <DIMPlugins/DIMPlainKey.h>
+#import <DIMPlugins/DIMSecKeyHelper.h>
+#import <DIMPlugins/DIMECCPublicKey.h>
+#import <DIMPlugins/DIMECCPrivateKey.h>
+#import <DIMPlugins/DIMRSAPublicKey.h>
+#import <DIMPlugins/DIMRSAPrivateKey.h>
+#import <DIMPlugins/DIMPrivateKey+Store.h>
 
-@end
+// Data
+#import <DIMPlugins/DIMDigesters.h>
+#import <DIMPlugins/DIMDataCoders.h>
+#import <DIMPlugins/DIMDataParsers.h>
+#import <DIMPlugins/DIMBase64Data.h>
+#import <DIMPlugins/DIMBaseNetworkFile.h>
 
-@interface DIMKECCAK256Digester : NSObject <MKMessageDigester>
-
-@end
-
-@interface DIMRIPEMD160Digester : NSObject <MKMessageDigester>
-
-@end
-
-NS_ASSUME_NONNULL_END
+#endif /* ! __DIM_PLUGINS__ */
