@@ -71,7 +71,7 @@
 
 // Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
-    NSAssert(self.type == MKMMetaType_ETH || self.type == MKMMetaType_ExETH,
+    NSAssert([self.type isEqualToString:MKMMetaType_ETH] || [self.type isEqualToString:MKMMetaType_ExETH],
              @"meta version error: %@", self.type);
     NSAssert(network == MKMEntityType_User, @"ETH address type error: %d", network);
     DIMETHAddress *address = _cachedAddress;

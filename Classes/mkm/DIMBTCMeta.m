@@ -71,7 +71,7 @@
 
 // Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
-    NSAssert(self.type == MKMMetaType_BTC || self.type == MKMMetaType_ExBTC,
+    NSAssert([self.type isEqualToString:MKMMetaType_BTC] || [self.type isEqualToString:MKMMetaType_ExBTC],
              @"meta version error: %@", self.type);
     DIMBTCAddress *address = [_cachedAddresses objectForKey:@(network)];
     if (!address) {

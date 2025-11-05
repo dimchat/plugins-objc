@@ -35,8 +35,6 @@
 //  Copyright © 2020 Albert Moky. All rights reserved.
 //
 
-#import <DIMCore/DIMCore.h>
-
 #import "DIMBTCAddress.h"
 #import "DIMETHAddress.h"
 

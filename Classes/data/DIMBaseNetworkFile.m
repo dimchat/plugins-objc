@@ -35,8 +35,6 @@
 //  Copyright © 2023 DIM Group. All rights reserved.
 //
 
-#import <DIMCore/DIMCore.h>
-
 #import "DIMBaseNetworkFile.h"
 
 @interface DIMBaseNetworkFile() {

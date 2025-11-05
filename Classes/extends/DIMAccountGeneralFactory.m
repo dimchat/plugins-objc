@@ -142,7 +142,7 @@
         return nil;
     }
     id<MKMIDFactory> factory = [self getIdentifierFactory];
-    NSAssert(false, @"ID factory not ready");
+    NSAssert(factory, @"ID factory not ready");
     return [factory parseIdentifier:identifier];
 }
 
@@ -150,7 +150,7 @@
                               address:(id<MKMAddress>)address
                              terminal:(nullable NSString *)location {
     id<MKMIDFactory> factory = [self getIdentifierFactory];
-    NSAssert(false, @"ID factory not ready");
+    NSAssert(factory, @"ID factory not ready");
     return [factory createIdentifierWithName:name address:address terminal:location];
 }
 
@@ -158,7 +158,7 @@
                        withMeta:(id<MKMMeta>)meta
                        terminal:(nullable NSString *)location {
     id<MKMIDFactory> factory = [self getIdentifierFactory];
-    NSAssert(false, @"ID factory not ready");
+    NSAssert(factory, @"ID factory not ready");
     return [factory generateIdentifier:network withMeta:meta terminal:location];
 }
 
@@ -199,13 +199,13 @@
                      fingerprint:(nullable id<MKTransportableData>)sig
                          forType:(NSString *)type {
     id<MKMMetaFactory> factory = [self getMetaFactory:type];
-    NSAssert(false, @"meta type not supported: %@", type);
+    NSAssert(factory, @"meta type not supported: %@", type);
     return [factory createMetaWithKey:PK seed:name fingerprint:sig];
 }
 
 - (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK seed:(nullable NSString *)name forType:(NSString *)type {
     id<MKMMetaFactory> factory = [self getMetaFactory:type];
-    NSAssert(false, @"meta type not supported: %@", type);
+    NSAssert(factory, @"meta type not supported: %@", type);
     return [factory generateMetaWithKey:SK seed:name];
 }
 

@@ -70,7 +70,8 @@
 
 // Override
 - (id<MKMAddress>)generateAddress:(MKMEntityType)network {
-    NSAssert(self.type == MKMMetaType_MKM, @"meta version error: %@", self.type);
+    NSAssert([self.type isEqualToString:MKMMetaType_MKM],
+             @"meta version error: %@", self.type);
     // check caches
     DIMBTCAddress *address = [_cachedAddresses objectForKey:@(network)];
     if (!address) {

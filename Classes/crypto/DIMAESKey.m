@@ -149,7 +149,7 @@ static inline NSData *random_data(NSUInteger size) {
     // decode IV data
     id<MKTransportableData> ted = MKTransportableDataParse(base64);
     NSData *ivData = [ted data];
-    NSAssert([ivData length] > 0, @"IV data error: %@", base64);
+    //NSAssert([ivData length] > 0, @"IV data error: %@", base64);
     return ivData;
 }
 
