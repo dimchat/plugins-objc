@@ -67,21 +67,21 @@
     NSString *type = [self getType:_type forID:ID];
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithID:ID data:json signature:CT];
+            return [[DIMVisa alloc] initWithIdentifier:ID data:json signature:CT];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithID:ID data:json signature:CT];
+            return [[DIMBulletin alloc] initWithIdentifier:ID data:json signature:CT];
         }
-        return [[DIMDocument alloc] initWithID:ID data:json signature:CT];
+        return [[DIMDocument alloc] initWithIdentifier:ID data:json signature:CT];
     } else {
         // create a new empty document with entity ID
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithID:ID];
+            return [[DIMVisa alloc] initWithIdentifier:ID];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithID:ID];
+            return [[DIMBulletin alloc] initWithIdentifier:ID];
         }
-        return [[DIMDocument alloc] initWithID:ID type:type];
+        return [[DIMDocument alloc] initWithIdentifier:ID type:type];
     }
 }
 
