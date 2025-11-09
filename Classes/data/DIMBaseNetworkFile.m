@@ -49,7 +49,8 @@
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     if (self = [super initWithDictionary:dict]) {
-        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:self.dictionary];
+        dict = [self dictionary];
+        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:dict];
     }
     return self;
 }
@@ -57,7 +58,8 @@
 /* designated initializer */
 - (instancetype)init {
     if (self = [super init]) {
-        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:self.dictionary];
+        NSMutableDictionary *dict = [self dictionary];
+        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:dict];
     }
     return self;
 }
@@ -69,19 +71,19 @@
     if (self = [self init]) {
         // file data
         if (data) {
-            _wrapper.data = data;
+            [_wrapper setData:data];
         }
         // file name
         if (name) {
-            _wrapper.filename = name;
+            [_wrapper setFilename:name];
         }
         // remote URL
         if (locator) {
-            _wrapper.URL = locator;
+            [_wrapper setURL:locator];
         }
         // decrypt key
         if (key) {
-            _wrapper.password = key;
+            [_wrapper setPassword:key];
         }
     }
     return self;
@@ -89,7 +91,8 @@
 
 // Override
 - (NSData *)data {
-    return [_wrapper.data data];
+    id<MKTransportableData> ted = [_wrapper data];
+    return [ted data];
 }
 
 // Override

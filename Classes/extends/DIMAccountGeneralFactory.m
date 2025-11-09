@@ -74,14 +74,13 @@
         return aValue;
     }
     // get type for did
-    id did = [doc objectForKey:@"did"];
-    id<MKMID> ID = MKMIDParse(did);
-    if (!ID) {
+    id<MKMID> did = MKMIDParse([doc objectForKey:@"did"]);
+    if (!did) {
         NSAssert(false, @"document error: %@", doc);
         return nil;
-    } else if ([ID isUser]) {
+    } else if ([did isUser]) {
         return MKMDocumentType_Visa;
-    } else if ([ID isGroup]) {
+    } else if ([did isGroup]) {
         return MKMDocumentType_Bulletin;
     } else {
         return MKMDocumentType_Profile;
@@ -241,13 +240,13 @@
     return [factory parseDocument:info];
 }
 
-- (id<MKMDocument>)createDocument:(id<MKMID>)ID
+- (id<MKMDocument>)createDocument:(id<MKMID>)did
                              data:(nullable NSString *)json
                         signature:(nullable id<MKTransportableData>)sig
                           forType:(nonnull NSString *)type {
     id<MKMDocumentFactory> factory = [self getDocumentFactory:type];
     NSAssert(factory, @"document type not supported: %@", type);
-    return [factory createDocument:ID data:json signature:sig];
+    return [factory createDocument:did data:json signature:sig];
 }
 
 @end

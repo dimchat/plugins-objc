@@ -48,12 +48,12 @@
     return self;
 }
 
-- (NSString *)getType:(NSString *)type forID:(id<MKMID>)ID {
+- (NSString *)getType:(NSString *)type forIdentifier:(id<MKMID>)did {
     if (![type isEqualToString:@"*"]) {
         return type;
-    } else if ([ID isGroup]) {
+    } else if ([did isGroup]) {
         return MKMDocumentType_Bulletin;
-    } else if ([ID isUser]) {
+    } else if ([did isUser]) {
         return MKMDocumentType_Visa;
     } else {
         return MKMDocumentType_Profile;
@@ -61,34 +61,34 @@
 }
 
 // Override
-- (id<MKMDocument>)createDocument:(id<MKMID>)ID
+- (id<MKMDocument>)createDocument:(id<MKMID>)did
                              data:(nullable NSString *)json
                         signature:(nullable id<MKTransportableData>)CT {
-    NSString *type = [self getType:_type forID:ID];
+    NSString *type = [self getType:_type forIdentifier:did];
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithIdentifier:ID data:json signature:CT];
+            return [[DIMVisa alloc] initWithIdentifier:did data:json signature:CT];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithIdentifier:ID data:json signature:CT];
+            return [[DIMBulletin alloc] initWithIdentifier:did data:json signature:CT];
         }
-        return [[DIMDocument alloc] initWithIdentifier:ID data:json signature:CT];
+        return [[DIMDocument alloc] initWithIdentifier:did data:json signature:CT];
     } else {
         // create a new empty document with entity ID
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithIdentifier:ID];
+            return [[DIMVisa alloc] initWithIdentifier:did];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithIdentifier:ID];
+            return [[DIMBulletin alloc] initWithIdentifier:did];
         }
-        return [[DIMDocument alloc] initWithIdentifier:ID type:type];
+        return [[DIMDocument alloc] initWithIdentifier:did type:type];
     }
 }
 
 // Override
 - (nullable id<MKMDocument>)parseDocument:(NSDictionary *)doc {
-    id<MKMID> ID = MKMIDParse([doc objectForKey:@"did"]);
-    if (!ID) {
+    id<MKMID> did = MKMIDParse([doc objectForKey:@"did"]);
+    if (!did) {
         NSAssert(false, @"document ID not found: %@", doc);
         return nil;
     } else if ([doc objectForKey:@"data"] && [doc objectForKey:@"signature"]) {
@@ -102,7 +102,7 @@
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *type = [ext.helper getDocumentType:doc defaultValue:nil];
     if (!type) {
-        type = [self getType:@"I" forID:ID];
+        type = [self getType:@"I" forIdentifier:did];
     }
     if ([type isEqualToString:MKMDocumentType_Visa]) {
         return [[DIMVisa alloc] initWithDictionary:doc];

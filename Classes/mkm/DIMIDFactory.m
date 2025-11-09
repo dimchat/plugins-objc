@@ -62,23 +62,23 @@
                               address:(id<MKMAddress>)address
                              terminal:(NSString *)location {
     NSString *string = MKMIDConcat(name, address, location);
-    id<MKMID> ID = [_identifiers objectForKey:string];
-    if (!ID) {
-        ID = [self newID:string name:name address:address terminal:location];
-        [_identifiers setObject:ID forKey:string];
+    id<MKMID> did = [_identifiers objectForKey:string];
+    if (!did) {
+        did = [self newID:string name:name address:address terminal:location];
+        [_identifiers setObject:did forKey:string];
     }
-    return ID;
+    return did;
 }
 
 - (nullable id<MKMID>)parseIdentifier:(NSString *)identifier {
-    id<MKMID> ID = [_identifiers objectForKey:identifier];
-    if (!ID) {
-        ID = [self parse:identifier];
-        if (ID) {
-            [_identifiers setObject:ID forKey:identifier];
+    id<MKMID> did = [_identifiers objectForKey:identifier];
+    if (!did) {
+        did = [self parse:identifier];
+        if (did) {
+            [_identifiers setObject:did forKey:identifier];
         }
     }
-    return ID;
+    return did;
 }
 
 - (id<MKMID>)newID:(NSString *)identifier
