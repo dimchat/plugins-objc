@@ -73,6 +73,7 @@ NS_ASSUME_NONNULL_END
 
 @implementation DIMCompatibleAddressFactory
 
+// Override
 - (id<MKMAddress>)parse:(NSString *)address {
     NSComparisonResult res;
     NSUInteger len = [address length];
@@ -119,6 +120,7 @@ NS_ASSUME_NONNULL_END
 
 @implementation DIMUnknownAddress
 
+// Override
 - (MKMEntityType)network {
     return MKMEntityType_User;  // 0
 }
@@ -181,7 +183,7 @@ NS_ASSUME_NONNULL_END
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DIMCommonPluginLoader : DIMPluginLoader
+@interface DIMCompatiblePluginLoader : DIMPluginLoader
 
 @end
 
@@ -192,14 +194,13 @@ NS_ASSUME_NONNULL_END
 #import "DIMCompatibleAddressFactory.h"
 #import "DIMCompatibleMetaFactory.h"
 
-#import "DIMCommonPluginLoader.h"
+#import "DIMCompatiblePluginLoader.h"
 
-@implementation DIMCommonPluginLoader
+@implementation DIMCompatiblePluginLoader
 
 // Override
 - (void)registerAddressFactory {
-    DIMCompatibleAddressFactory *factory = [[DIMCompatibleAddressFactory alloc] init];
-    MKMAddressSetFactory(factory);
+    MKMAddressSetFactory([[DIMCompatibleAddressFactory alloc] init]);
 }
 
 // Override
@@ -298,7 +299,7 @@ NS_ASSUME_NONNULL_END
 
 ```objective-c
 #import "DIMCommonExtensionLoader.h"
-#import "DIMCommonPluginLoader.h"
+#import "DIMCompatiblePluginLoader.h"
 
 #import "DIMLibraryLoader.h"
 
@@ -315,14 +316,21 @@ NS_ASSUME_NONNULL_END
 @implementation DIMLibraryLoader
 
 - (instancetype)init {
-    DIMExtensionLoader *extensionLoader = [[DIMCommonExtensionLoader alloc] init];
-    DIMPluginLoader *pluginLoader = [[DIMCommonPluginLoader alloc] init];
+    NSAssert(false, @"DON'T call me");
+    DIMExtensionLoader *extensionLoader = nil;
+    DIMPluginLoader *pluginLoader = nil;
     return [self initWithExtensionLoader:extensionLoader andPluginLoader:pluginLoader];
 }
 
 /* designated initializer */
 - (instancetype)initWithExtensionLoader:(DIMExtensionLoader *)extensionLoader
                         andPluginLoader:(DIMPluginLoader *)pluginLoader {
+    if (!extensionLoader) {
+        extensionLoader = [[DIMCommonExtensionLoader alloc] init];
+    }
+    if (!pluginLoader) {
+        pluginLoader = [[DIMCompatiblePluginLoader alloc] init];
+    }
     if (self = [super init]) {
         self.extensionLoader = extensionLoader;
         self.pluginLoader = pluginLoader;

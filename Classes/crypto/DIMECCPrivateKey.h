@@ -50,6 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMECCPrivateKey : DIMPrivateKey
 
+@end
+
+@interface DIMECCPrivateKey (Creation)
+
 + (instancetype)newKey;
 
 @end
@@ -61,6 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)saveKeyWithIdentifier:(NSString *)identifier;
 
 @end
+
+#pragma mark -
 
 @interface DIMECCPrivateKeyFactory : NSObject <MKPrivateKeyFactory>
 

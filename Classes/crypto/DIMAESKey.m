@@ -80,23 +80,6 @@ static inline NSData *random_data(NSUInteger size) {
     return key;
 }
 
-+ (instancetype)newKey {
-    return [self newKey:kCCKeySizeAES256]; // 32
-}
-
-+ (instancetype)newKey:(NSUInteger)keySize {
-    NSData *data = random_data(keySize);
-    id<MKTransportableData> ted = MKTransportableDataCreate(data, nil);
-    DIMAESKey *key = [[DIMAESKey alloc] initWithDictionary:@{
-        @"algorithm": MKSymmetricAlgorithm_AES,
-        @"data": ted.object,
-        //@"mode": @"CBC",
-        //@"padding": @"PKCS7",
-    }];
-    key.tedKey = ted;
-    return key;
-}
-
 // protected
 - (NSUInteger)keySize {
     // TODO: get from key data
@@ -224,6 +207,29 @@ static inline NSData *random_data(NSUInteger size) {
 }
 
 @end
+
+@implementation DIMAESKey (Creation)
+
++ (instancetype)newKey {
+    return [self newKey:kCCKeySizeAES256]; // 32
+}
+
++ (instancetype)newKey:(NSUInteger)keySize {
+    NSData *data = random_data(keySize);
+    id<MKTransportableData> ted = MKTransportableDataCreate(data, nil);
+    DIMAESKey *key = [[DIMAESKey alloc] initWithDictionary:@{
+        @"algorithm": MKSymmetricAlgorithm_AES,
+        @"data": ted.object,
+        //@"mode": @"CBC",
+        //@"padding": @"PKCS7",
+    }];
+    key.tedKey = ted;
+    return key;
+}
+
+@end
+
+#pragma mark -
 
 @implementation DIMAESKeyFactory
 

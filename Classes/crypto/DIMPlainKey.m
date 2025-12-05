@@ -38,20 +38,10 @@
 
 @implementation DIMPlainKey
 
-static DIMPlainKey *s_sharedPlainKey = nil;
-
-+ (instancetype)sharedInstance {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (!s_sharedPlainKey) {
-            s_sharedPlainKey = [[DIMPlainKey alloc] init];
-        }
-    });
-    return s_sharedPlainKey;
-}
-
 - (instancetype)init {
-    NSDictionary *dict = @{@"algorithm": MKSymmetricAlgorithm_Plain};
+    NSDictionary *dict = @{
+        @"algorithm": MKSymmetricAlgorithm_Plain
+    };
     if (self = [super initWithDictionary:dict]) {
         //
     }
@@ -77,16 +67,41 @@ static DIMPlainKey *s_sharedPlainKey = nil;
 
 @end
 
+@implementation DIMPlainKey (Creation)
+
+static DIMPlainKey *s_sharedPlainKey = nil;
+
++ (instancetype)sharedKey {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (!s_sharedPlainKey) {
+            s_sharedPlainKey = [[DIMPlainKey alloc] init];
+        }
+    });
+    return s_sharedPlainKey;
+}
+
+@end
+
+#pragma mark -
+
 @implementation DIMPlainKeyFactory
 
 // Override
 - (id<MKSymmetricKey>)generateSymmetricKey {
-    return [DIMPlainKey sharedInstance];
+    return [DIMPlainKey sharedKey];
 }
 
 // Override
 - (nullable id<MKSymmetricKey>)parseSymmetricKey:(NSDictionary *)key {
-    return [DIMPlainKey sharedInstance];
+    // check 'algorithm'
+    NSString *algorithm = DIMCryptoGetKeyAlgorithm(key);
+    if (![algorithm isEqualToString:MKSymmetricAlgorithm_Plain]) {
+        // algorithm not matched
+        NSAssert(false, @"Plain key error: %@", key);
+        return nil;
+    }
+    return [[DIMPlainKey alloc] initWithDictionary:key];
 }
 
 @end

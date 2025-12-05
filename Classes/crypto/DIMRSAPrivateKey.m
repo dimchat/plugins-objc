@@ -92,51 +92,6 @@ extern NSString *NSStringFromKeyContent(NSString *content, NSString *tag);
     return key;
 }
 
-+ (instancetype)newKey {
-    return [self newKey:(1024 / 8)]; // 128
-}
-
-+ (instancetype)newKey:(NSUInteger)keySize {
-    // 2. prepare parameters
-    NSDictionary *params;
-    params = @{(id)kSecAttrKeyType      :(id)kSecAttrKeyTypeRSA,
-               (id)kSecAttrKeySizeInBits:@(keySize * 8),
-               //(id)kSecAttrIsPermanent:@YES,
-               };
-    // 3. generate
-    CFErrorRef error = NULL;
-    SecKeyRef keyRef = SecKeyCreateRandomKey((CFDictionaryRef)params,
-                                             &error);
-    if (error) {
-        NSAssert(!keyRef, @"RSA key ref should be empty when failed");
-        NSAssert(false, @"RSA failed to generate key: %@", error);
-        CFRelease(error);
-        error = NULL;
-        return nil;
-    }
-    NSAssert(keyRef, @"RSA private key ref should be set here");
-    
-    // 4. key to data
-    NSData *data = NSDataFromSecKeyRef(keyRef);
-    NSString *base64 = MKBase64Encode(data);
-    NSString *pem = NSStringFromKeyContent(base64, @"RSA PRIVATE");
-    //NSString *pem = [DIMSecKeyHelper serializePrivateKey:keyRef
-    //                                           algorithm:MKAsymmetricAlgorithm_RSA];
-    //data = [DIMSecKeyHelper privateKeyDataFromContent:pem
-    //                                        algorithm:MKAsymmetricAlgorithm_RSA];
-    // 5. build key info
-    DIMRSAPrivateKey *key = [[DIMRSAPrivateKey alloc] initWithDictionary:@{
-        @"algorithm" : MKAsymmetricAlgorithm_RSA,
-        @"data"      : pem,
-        @"mode"      : @"ECB",
-        @"padding"   : @"PKCS1",
-        @"digest"    : @"SHA256",
-    }];
-    key.keyData = data;
-    key.privateKeyRef = keyRef;
-    return key;
-}
-
 // protected
 - (NSUInteger)keySize {
     // get from key data
@@ -290,6 +245,57 @@ extern NSString *NSStringFromKeyContent(NSString *content, NSString *tag);
 }
 
 @end
+
+@implementation DIMRSAPrivateKey (Creation)
+
++ (instancetype)newKey {
+    return [self newKey:(1024 / 8)]; // 128
+}
+
++ (instancetype)newKey:(NSUInteger)keySize {
+    // 2. prepare parameters
+    NSDictionary *params;
+    params = @{(id)kSecAttrKeyType      :(id)kSecAttrKeyTypeRSA,
+               (id)kSecAttrKeySizeInBits:@(keySize * 8),
+               //(id)kSecAttrIsPermanent:@YES,
+               };
+    // 3. generate
+    CFErrorRef error = NULL;
+    SecKeyRef keyRef = SecKeyCreateRandomKey((CFDictionaryRef)params,
+                                             &error);
+    if (error) {
+        NSAssert(!keyRef, @"RSA key ref should be empty when failed");
+        NSAssert(false, @"RSA failed to generate key: %@", error);
+        CFRelease(error);
+        error = NULL;
+        return nil;
+    }
+    NSAssert(keyRef, @"RSA private key ref should be set here");
+    
+    // 4. key to data
+    NSData *data = NSDataFromSecKeyRef(keyRef);
+    NSString *base64 = MKBase64Encode(data);
+    NSString *pem = NSStringFromKeyContent(base64, @"RSA PRIVATE");
+    //NSString *pem = [DIMSecKeyHelper serializePrivateKey:keyRef
+    //                                           algorithm:MKAsymmetricAlgorithm_RSA];
+    //data = [DIMSecKeyHelper privateKeyDataFromContent:pem
+    //                                        algorithm:MKAsymmetricAlgorithm_RSA];
+    // 5. build key info
+    DIMRSAPrivateKey *key = [[DIMRSAPrivateKey alloc] initWithDictionary:@{
+        @"algorithm" : MKAsymmetricAlgorithm_RSA,
+        @"data"      : pem,
+        @"mode"      : @"ECB",
+        @"padding"   : @"PKCS1",
+        @"digest"    : @"SHA256",
+    }];
+    key.keyData = data;
+    key.privateKeyRef = keyRef;
+    return key;
+}
+
+@end
+
+#pragma mark -
 
 @implementation DIMRSAPrivateKeyFactory
 

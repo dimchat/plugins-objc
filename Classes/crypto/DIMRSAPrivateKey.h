@@ -49,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMRSAPrivateKey : DIMPrivateKey <MKDecryptKey>
 
+@end
+
+@interface DIMRSAPrivateKey (Creation)
+
 + (instancetype)newKey;
 + (instancetype)newKey:(NSUInteger)keySize;
 
@@ -61,6 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)saveKeyWithIdentifier:(NSString *)identifier;
 
 @end
+
+#pragma mark -
 
 @interface DIMRSAPrivateKeyFactory : NSObject <MKPrivateKeyFactory>
 

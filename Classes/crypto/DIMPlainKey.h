@@ -49,9 +49,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface DIMPlainKey : DIMSymmetricKey
 
-+ (instancetype)sharedInstance;
+@end
+
+@interface DIMPlainKey (Creation)
+
++ (instancetype)sharedKey;
 
 @end
+
+#pragma mark -
 
 @interface DIMPlainKeyFactory : NSObject <MKSymmetricKeyFactory>
 

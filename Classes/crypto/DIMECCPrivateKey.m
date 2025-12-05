@@ -143,27 +143,6 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
     return key;
 }
 
-+ (instancetype)newKey {
-    // TODO: check key size?
-    uint8_t pubkey[64] = {0};
-    uint8_t prikey[32] = {0};
-    int res = uECC_make_key(pubkey, prikey, uECC_secp256k1());
-    if (res != 1) {
-        NSAssert(false, @"failed to generate ECC private key");
-        return nil;
-    }
-    NSData *data = [[NSData alloc] initWithBytes:prikey length:32];
-    // build key info
-    DIMECCPrivateKey *key = [[DIMECCPrivateKey alloc] initWithDictionary:@{
-        @"algorithm" : MKAsymmetricAlgorithm_ECC,
-        @"data"      : MKHexEncode(data),
-        @"curve"     : @"SECP256k1",
-        @"digest"    : @"SHA256",
-    }];
-    key.keyData = data;
-    return key;
-}
-
 // protected
 - (NSUInteger)keySize {
     // TODO: get from key data
@@ -252,6 +231,33 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
 }
 
 @end
+
+@implementation DIMECCPrivateKey (Creation)
+
++ (instancetype)newKey {
+    // TODO: check key size?
+    uint8_t pubkey[64] = {0};
+    uint8_t prikey[32] = {0};
+    int res = uECC_make_key(pubkey, prikey, uECC_secp256k1());
+    if (res != 1) {
+        NSAssert(false, @"failed to generate ECC private key");
+        return nil;
+    }
+    NSData *data = [[NSData alloc] initWithBytes:prikey length:32];
+    // build key info
+    DIMECCPrivateKey *key = [[DIMECCPrivateKey alloc] initWithDictionary:@{
+        @"algorithm" : MKAsymmetricAlgorithm_ECC,
+        @"data"      : MKHexEncode(data),
+        @"curve"     : @"SECP256k1",
+        @"digest"    : @"SHA256",
+    }];
+    key.keyData = data;
+    return key;
+}
+
+@end
+
+#pragma mark -
 
 @implementation DIMECCPrivateKeyFactory
 
