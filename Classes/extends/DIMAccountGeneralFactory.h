@@ -39,7 +39,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DIMAccountGeneralFactory : NSObject <MKMGeneralAccountHelper,
-                                                MKMAddressHelper, MKMIdentifierHelper,
+                                                MKMAddressHelper, MKMIDHelper,
                                                 MKMMetaHelper, MKMDocumentHelper>
 
 @end

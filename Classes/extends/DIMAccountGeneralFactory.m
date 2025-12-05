@@ -113,23 +113,24 @@
     return [factory parseAddress:address];
 }
 
-- (id<MKMAddress>)generateAddress:(MKMEntityType)network withMeta:(id<MKMMeta>)meta {
+- (__kindof id<MKMAddress>)generateAddressWithMeta:(id<MKMMeta>)meta
+                                              type:(MKMEntityType)network {
     id<MKMAddressFactory> factory = [self getAddressFactory];
     NSAssert(factory, @"address factory not ready");
-    return [factory generateAddress:network withMeta:meta];
+    return [factory generateAddressWithMeta:meta type:network];
 }
 
 #pragma mark ID
 
-- (void)setIdentifierFactory:(id<MKMIDFactory>)factory {
+- (void)setIDFactory:(id<MKMIDFactory>)factory {
     _idFactory = factory;
 }
 
-- (nullable id<MKMIDFactory>)getIdentifierFactory {
+- (nullable id<MKMIDFactory>)getIDFactory {
     return _idFactory;
 }
 
-- (nullable id<MKMID>)parseIdentifier:(nullable id)identifier {
+- (nullable id<MKMID>)parseID:(nullable id)identifier {
     if (!identifier) {
         return nil;
     } else if ([identifier conformsToProtocol:@protocol(MKMID)]) {
@@ -140,25 +141,25 @@
         NSAssert(false, @"ID error: %@", identifier);
         return nil;
     }
-    id<MKMIDFactory> factory = [self getIdentifierFactory];
+    id<MKMIDFactory> factory = [self getIDFactory];
     NSAssert(factory, @"ID factory not ready");
-    return [factory parseIdentifier:identifier];
+    return [factory parseID:identifier];
 }
 
-- (id<MKMID>)createIdentifierWithName:(nullable NSString *)name
-                              address:(id<MKMAddress>)address
-                             terminal:(nullable NSString *)location {
-    id<MKMIDFactory> factory = [self getIdentifierFactory];
+- (id<MKMID>)createIDWithAddress:(id<MKMAddress>)address
+                            name:(nullable NSString *)seed
+                        terminal:(nullable NSString *)location {
+    id<MKMIDFactory> factory = [self getIDFactory];
     NSAssert(factory, @"ID factory not ready");
-    return [factory createIdentifierWithName:name address:address terminal:location];
+    return [factory createIDWithAddress:address name:seed terminal:location];
 }
 
-- (id<MKMID>)generateIdentifier:(MKMEntityType)network
-                       withMeta:(id<MKMMeta>)meta
+- (id<MKMID>)generateIDWithMeta:(id<MKMMeta>)meta
+                           type:(MKMEntityType)network
                        terminal:(nullable NSString *)location {
-    id<MKMIDFactory> factory = [self getIdentifierFactory];
+    id<MKMIDFactory> factory = [self getIDFactory];
     NSAssert(factory, @"ID factory not ready");
-    return [factory generateIdentifier:network withMeta:meta terminal:location];
+    return [factory generateIDWithMeta:meta type:network terminal:location];
 }
 
 #pragma mark Meta
@@ -202,7 +203,9 @@
     return [factory createMetaWithKey:PK seed:name fingerprint:sig];
 }
 
-- (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK seed:(nullable NSString *)name forType:(NSString *)type {
+- (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK
+                              seed:(nullable NSString *)name
+                           forType:(NSString *)type {
     id<MKMMetaFactory> factory = [self getMetaFactory:type];
     NSAssert(factory, @"meta type not supported: %@", type);
     return [factory generateMetaWithKey:SK seed:name];

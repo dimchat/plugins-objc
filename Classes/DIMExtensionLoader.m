@@ -232,10 +232,6 @@
     DIMCommandRegisterClass(DKDGroupCommand_Quit, DIMQuitGroupCommand);
     //DIMCommandRegisterClass(DKDGroupCommand_Query, DIMQueryGroupCommand);
     DIMCommandRegisterClass(DKDGroupCommand_Reset, DIMResetGroupCommand);
-    // Group Admin Commands
-    DIMCommandRegisterClass(DKDGroupCommand_Hire, DIMHireGroupCommand);
-    DIMCommandRegisterClass(DKDGroupCommand_Fire, DIMFireGroupCommand);
-    DIMCommandRegisterClass(DKDGroupCommand_Resign, DIMResignGroupCommand);
     
 }
 

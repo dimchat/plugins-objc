@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithType:(NSString *)type;
 
 // protected
-- (NSString *)getType:(NSString *)type forIdentifier:(id<MKMID>)did;
+- (NSString *)getDocumentType:(NSString *)type forID:(id<MKMID>)did;
 
 @end
 

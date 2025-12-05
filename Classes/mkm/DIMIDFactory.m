@@ -49,28 +49,28 @@
 }
 
 // Override
-- (id<MKMID>)generateIdentifier:(MKMEntityType)network
-                       withMeta:(id<MKMMeta>)meta
-                       terminal:(nullable NSString *)locater {
-    id<MKMAddress> address = MKMAddressGenerate(network, meta);
+- (id<MKMID>)generateIDWithMeta:(id<MKMMeta>)meta
+                           type:(MKMEntityType)network
+                       terminal:(nullable NSString *)location {
+    id<MKMAddress> address = MKMAddressGenerate(meta, network);
     NSAssert(address, @"failed to generate address with meta: %@", meta);
-    return MKMIDCreate(meta.seed, address, locater);
+    return MKMIDCreate(meta.seed, address, location);
 }
 
 // Override
-- (id<MKMID>)createIdentifierWithName:(NSString *)name
-                              address:(id<MKMAddress>)address
-                             terminal:(NSString *)location {
-    NSString *string = MKMIDConcat(name, address, location);
+- (id<MKMID>)createIDWithAddress:(id<MKMAddress>)address
+                            name:(nullable NSString *)seed
+                        terminal:(nullable NSString *)location {
+    NSString *string = MKMIDConcat(seed, address, location);
     id<MKMID> did = [_identifiers objectForKey:string];
     if (!did) {
-        did = [self newID:string name:name address:address terminal:location];
+        did = [self newID:string name:seed address:address terminal:location];
         [_identifiers setObject:did forKey:string];
     }
     return did;
 }
 
-- (nullable id<MKMID>)parseIdentifier:(NSString *)identifier {
+- (nullable id<MKMID>)parseID:(NSString *)identifier {
     id<MKMID> did = [_identifiers objectForKey:identifier];
     if (!did) {
         did = [self parse:identifier];

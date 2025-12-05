@@ -48,7 +48,7 @@
     return self;
 }
 
-- (NSString *)getType:(NSString *)type forIdentifier:(id<MKMID>)did {
+- (NSString *)getDocumentType:(NSString *)type forID:(id<MKMID>)did {
     if (![type isEqualToString:@"*"]) {
         return type;
     } else if ([did isGroup]) {
@@ -64,24 +64,24 @@
 - (id<MKMDocument>)createDocument:(id<MKMID>)did
                              data:(nullable NSString *)json
                         signature:(nullable id<MKTransportableData>)CT {
-    NSString *type = [self getType:_type forIdentifier:did];
+    NSString *type = [self getDocumentType:_type forID:did];
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithIdentifier:did data:json signature:CT];
+            return [[DIMVisa alloc] initWithID:did data:json signature:CT];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithIdentifier:did data:json signature:CT];
+            return [[DIMBulletin alloc] initWithID:did data:json signature:CT];
         }
-        return [[DIMDocument alloc] initWithIdentifier:did data:json signature:CT];
+        return [[DIMDocument alloc] initWithID:did data:json signature:CT];
     } else {
         // create a new empty document with entity ID
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithIdentifier:did];
+            return [[DIMVisa alloc] initWithID:did];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithIdentifier:did];
+            return [[DIMBulletin alloc] initWithID:did];
         }
-        return [[DIMDocument alloc] initWithIdentifier:did type:type];
+        return [[DIMDocument alloc] initWithID:did type:type];
     }
 }
 
@@ -102,7 +102,7 @@
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *type = [ext.helper getDocumentType:doc defaultValue:nil];
     if (!type) {
-        type = [self getType:@"I" forIdentifier:did];
+        type = [self getDocumentType:@"I" forID:did];
     }
     if ([type isEqualToString:MKMDocumentType_Visa]) {
         return [[DIMVisa alloc] initWithDictionary:doc];

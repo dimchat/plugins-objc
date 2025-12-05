@@ -50,8 +50,8 @@
 }
 
 // Override
-- (id<MKMAddress>)generateAddress:(MKMEntityType)network
-                         withMeta:(id<MKMMeta>)meta {
+- (id<MKMAddress>)generateAddressWithMeta:(id<MKMMeta>)meta
+                                     type:(MKMEntityType)network {
     id<MKMAddress> address = [meta generateAddress:network];
     NSAssert(address, @"failed to generate address: %@", meta);
     [_addresses setObject:address forKey:address.string];
