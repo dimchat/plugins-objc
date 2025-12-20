@@ -61,27 +61,26 @@
 }
 
 // Override
-- (id<MKMDocument>)createDocument:(id<MKMID>)did
-                             data:(nullable NSString *)json
-                        signature:(nullable id<MKTransportableData>)CT {
-    NSString *type = [self getDocumentType:_type forID:did];
+- (id<MKMDocument>)createDocumentWithData:(nullable NSString *)json
+                                signature:(nullable id<MKTransportableData>)CT {
+    NSString *type = [self type];
     if (json && CT) {
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithID:did data:json signature:CT];
+            return [[DIMVisa alloc] initWithData:json signature:CT];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithID:did data:json signature:CT];
+            return [[DIMBulletin alloc] initWithData:json signature:CT];
         }
-        return [[DIMDocument alloc] initWithID:did data:json signature:CT];
+        return [[DIMDocument alloc] initWithType:type data:json signature:CT];
     } else {
         // create a new empty document with entity ID
         if ([type isEqualToString:MKMDocumentType_Visa]) {
-            return [[DIMVisa alloc] initWithID:did];
+            return [[DIMVisa alloc] init];
         }
         if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-            return [[DIMBulletin alloc] initWithID:did];
+            return [[DIMBulletin alloc] init];
         }
-        return [[DIMDocument alloc] initWithID:did type:type];
+        return [[DIMDocument alloc] initWithType:type];
     }
 }
 

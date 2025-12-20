@@ -61,11 +61,13 @@
     return self;
 }
 
+// Override
 - (nullable NSString *)getMetaType:(NSDictionary<NSString *,id> *)meta defaultValue:(nullable NSString *)aValue {
     id version = [meta objectForKey:@"type"];
     return MKConvertString(version, aValue);
 }
 
+// Override
 - (nullable NSString *)getDocumentType:(NSDictionary<NSString *,id> *)doc defaultValue:(nullable NSString *)aValue {
     id docType = [doc objectForKey:@"type"];
     if (docType) {
@@ -89,14 +91,17 @@
 
 #pragma mark Address
 
+// Override
 - (void)setAddressFactory:(id<MKMAddressFactory>)factory {
     _addressFactory = factory;
 }
 
-- (nullable id<MKMAddressFactory>)getAddressFactory { 
+// Override
+- (nullable id<MKMAddressFactory>)getAddressFactory {
     return _addressFactory;
 }
 
+// Override
 - (nullable id<MKMAddress>)parseAddress:(nullable id)address {
     if (!address) {
         return nil;
@@ -113,6 +118,7 @@
     return [factory parseAddress:address];
 }
 
+// Override
 - (__kindof id<MKMAddress>)generateAddressWithMeta:(id<MKMMeta>)meta
                                               type:(MKMEntityType)network {
     id<MKMAddressFactory> factory = [self getAddressFactory];
@@ -122,14 +128,17 @@
 
 #pragma mark ID
 
+// Override
 - (void)setIDFactory:(id<MKMIDFactory>)factory {
     _idFactory = factory;
 }
 
+// Override
 - (nullable id<MKMIDFactory>)getIDFactory {
     return _idFactory;
 }
 
+// Override
 - (nullable id<MKMID>)parseID:(nullable id)identifier {
     if (!identifier) {
         return nil;
@@ -146,6 +155,7 @@
     return [factory parseID:identifier];
 }
 
+// Override
 - (id<MKMID>)createIDWithAddress:(id<MKMAddress>)address
                             name:(nullable NSString *)seed
                         terminal:(nullable NSString *)location {
@@ -154,6 +164,7 @@
     return [factory createIDWithAddress:address name:seed terminal:location];
 }
 
+// Override
 - (id<MKMID>)generateIDWithMeta:(id<MKMMeta>)meta
                            type:(MKMEntityType)network
                        terminal:(nullable NSString *)location {
@@ -164,14 +175,17 @@
 
 #pragma mark Meta
 
+// Override
 - (void)setMetaFactory:(id<MKMMetaFactory>)factory forType:(NSString *)type {
     [_metaFactories setObject:factory forKey:type];
 }
 
+// Override
 - (nullable id<MKMMetaFactory>)getMetaFactory:(NSString *)type {
     return [_metaFactories objectForKey:type];
 }
 
+// Override
 - (nullable id<MKMMeta>)parseMeta:(nullable id)meta {
     if (!meta) {
         return nil;
@@ -194,6 +208,7 @@
     return [factory parseMeta:info];
 }
 
+// Override
 - (id<MKMMeta>)createMetaWithKey:(id<MKVerifyKey>)PK
                             seed:(nullable NSString *)name
                      fingerprint:(nullable id<MKTransportableData>)sig
@@ -203,6 +218,7 @@
     return [factory createMetaWithKey:PK seed:name fingerprint:sig];
 }
 
+// Override
 - (id<MKMMeta>)generateMetaWithKey:(id<MKSignKey>)SK
                               seed:(nullable NSString *)name
                            forType:(NSString *)type {
@@ -213,14 +229,17 @@
 
 #pragma mark Document
 
+// Override
 - (void)setDocumentFactory:(id<MKMDocumentFactory>)factory forType:(NSString *)type {
     [_docsFactories setObject:factory forKey:type];
 }
 
+// Override
 - (nullable id<MKMDocumentFactory>)getDocumentFactory:(NSString *)type {
     return [_docsFactories objectForKey:type];
 }
 
+// Override
 - (nullable id<MKMDocument>)parseDocument:(nullable id)doc {
     if (!doc) {
         return nil;
@@ -243,13 +262,13 @@
     return [factory parseDocument:info];
 }
 
-- (id<MKMDocument>)createDocument:(id<MKMID>)did
-                             data:(nullable NSString *)json
-                        signature:(nullable id<MKTransportableData>)sig
-                          forType:(nonnull NSString *)type {
+// Override
+- (id<MKMDocument>)createDocumentWithData:(nullable NSString *)json
+                                signature:(nullable id<MKTransportableData>)sig
+                                  forType:(nonnull NSString *)type {
     id<MKMDocumentFactory> factory = [self getDocumentFactory:type];
     NSAssert(factory, @"document type not supported: %@", type);
-    return [factory createDocument:did data:json signature:sig];
+    return [factory createDocumentWithData:json signature:sig];
 }
 
 @end
