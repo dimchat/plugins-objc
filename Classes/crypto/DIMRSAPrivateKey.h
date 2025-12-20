@@ -43,8 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  RSA Private Key
  *
  *      keyInfo format : {
- *          algorithm  : "RSA",
- *          data       : "..." // base64_encode()
+ *          "algorithm"  : "RSA",
+ *          "data"       : "..." // base64_encode()
  *      }
  */
 @interface DIMRSAPrivateKey : DIMPrivateKey <MKDecryptKey>

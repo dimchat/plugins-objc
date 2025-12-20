@@ -61,13 +61,14 @@
     if ([version isEqualToString:MKMMetaType_MKM]) {
         meta = [[DIMDefaultMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
     } else if ([version isEqualToString:MKMMetaType_BTC]) {
-        meta = [[DIMBTCMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
+        meta = [[DIMBTCMeta alloc] initWithType:version key:PK];
     } else if ([version isEqualToString:MKMMetaType_ETH]) {
-        meta = [[DIMETHMeta alloc] initWithType:version key:PK seed:name fingerprint:CT];
+        meta = [[DIMETHMeta alloc] initWithType:version key:PK];
     } else {
         NSAssert(false, @"meta type not supported: %@", version);
         meta = nil;
     }
+    NSAssert([meta isValid], @"meta error: %@", meta);
     return meta;
 }
 
@@ -88,7 +89,22 @@
 // Override
 - (nullable id<MKMMeta>)parseMeta:(NSDictionary *)info {
     // check 'type', 'key', 'seed', 'fingerprint'
-    // ...
+    if ([info objectForKey:@"type"] == nil || [info objectForKey:@"key"] == nil) {
+        // meta.type should not be empty
+        // meta.key should not be empty
+        NSAssert(false, @"meta error: %@", info);
+        return nil;
+    } else if ([info objectForKey:@"seed"] == nil) {
+        if ([info objectForKey:@"fingerprint"] != nil) {
+            NSAssert(false, @"meta error: %@", info);
+            return nil;
+        }
+    } else if ([info objectForKey:@"fingerprint"] == nil) {
+        NSAssert(false, @"meta error: %@", info);
+        return nil;
+    }
+    
+    // create meta for type
     id<MKMMeta> meta = nil;
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
     NSString *version = [ext.helper getMetaType:info defaultValue:nil];
@@ -102,7 +118,11 @@
         NSAssert(false, @"meta type not supported: %@", version);
         meta = nil;
     }
-    return [meta isValid] ? meta : nil;
+    if ([meta isValid]) {
+        return meta;
+    }
+    NSAssert(false, @"meta error: %@", info);
+    return nil;
 }
 
 @end

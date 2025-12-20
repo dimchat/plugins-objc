@@ -39,24 +39,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
+/**
  *  Meta to build BTC address for ID
  *
- *  version:
- *      0x02 - BTC
- *      0x03 - ExBTC
+ *      version:
+ *          0x02 - BTC
+ *          0x03 - ExBTC
  *
- *  algorithm:
- *      CT      = key.data;
- *      hash    = ripemd160(sha256(CT));
- *      code    = sha256(sha256(network + hash)).prefix(4);
- *      address = base58_encode(network + hash + code);
- *      number  = uint(code);
+ *      algorithm:
+ *          CT      = key.data;
+ *          hash    = ripemd160(sha256(CT));
+ *          code    = sha256(sha256(network + hash)).prefix(4);
+ *          address = base58_encode(network + hash + code);
+ *          number  = uint(code);
  */
 @interface DIMBTCMeta : DIMMeta
 
 // caches
 @property (strong, nonatomic) NSMutableDictionary<NSNumber *, id<MKMAddress>> *cachedAddresses;
+
+- (instancetype)initWithType:(NSString *)type key:(id<MKVerifyKey>)PK;
 
 @end
 

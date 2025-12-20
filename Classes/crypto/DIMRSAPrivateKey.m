@@ -299,14 +299,17 @@ extern NSString *NSStringFromKeyContent(NSString *content, NSString *tag);
 
 @implementation DIMRSAPrivateKeyFactory
 
+// Override
 - (id<MKPrivateKey>)generatePrivateKey {
     return [DIMRSAPrivateKey newKey];
 }
 
-- (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key { 
-    // check 'data'
-    if ([key objectForKey:@"data"] == nil) {
+// Override
+- (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
+    // check 'data', 'algorithm'
+    if ([key objectForKey:@"data"] == nil || [key objectForKey:@"algorithm"] == nil) {
         // key.data should not be empty
+        // key.algorithm should not be empty
         NSAssert(false, @"RSA key error: %@", key);
         return nil;
     }

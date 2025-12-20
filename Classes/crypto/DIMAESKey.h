@@ -42,10 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  AES Key
  *
- *      keyInfo format: {
- *          algorithm: "AES",
- *          keySize  : 32,                // optional
- *          data     : "{BASE64_ENCODE}", // key data
+ *      keyInfo format : {
+ *          "algorithm" : "AES",
+ *          "keySize"   : 32,                // optional
+ *          "data"      : "{BASE64_ENCODE}", // key data
  *      }
  */
 @interface DIMAESKey : DIMSymmetricKey

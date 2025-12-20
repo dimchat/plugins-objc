@@ -261,14 +261,17 @@ static inline int ecc_sig_to_der(const uint8_t *sig, uint8_t *der)
 
 @implementation DIMECCPrivateKeyFactory
 
+// Override
 - (id<MKPrivateKey>)generatePrivateKey {
     return [DIMECCPrivateKey newKey];
 }
 
+// Override
 - (nullable id<MKPrivateKey>)parsePrivateKey:(NSDictionary *)key {
-    // check 'data'
-    if ([key objectForKey:@"data"] == nil) {
+    // check 'data', 'algorithm'
+    if ([key objectForKey:@"data"] == nil || [key objectForKey:@"algorithm"] == nil) {
         // key.data should not be empty
+        // key.algorithm should not be empty
         NSAssert(false, @"ECC key error: %@", key);
         return nil;
     }

@@ -42,9 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  Symmetric key for broadcast message,
  *  which will do nothing when en/decoding message data
  *
- *      keyInfo forma t: {
- *          algorithm : "PLAIN",
- *          data      : ""       // empty data
+ *      keyInfo format : {
+ *          "algorithm" : "PLAIN",
+ *          "data"      : ""       // empty data
  *      }
  */
 @interface DIMPlainKey : DIMSymmetricKey

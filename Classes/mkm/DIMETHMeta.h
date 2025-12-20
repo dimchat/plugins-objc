@@ -42,19 +42,21 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Meta to build ETH address for ID
  *
- *  version:
- *      0x04 - ETH
- *      0x05 - ExETH
+ *      version:
+ *          0x04 - ETH
+ *          0x05 - ExETH
  *
- *  algorithm:
- *      CT      = key.data;  // without prefix byte
- *      digest  = keccak256(CT);
- *      address = hex_encode(digest.suffix(20));
+ *      algorithm:
+ *          CT      = key.data;  // without prefix byte
+ *          digest  = keccak256(CT);
+ *          address = hex_encode(digest.suffix(20));
  */
 @interface DIMETHMeta : DIMMeta
 
 // cache
 @property (strong, nonatomic, nullable) id<MKMAddress> cachedAddress;
+
+- (instancetype)initWithType:(NSString *)type key:(id<MKVerifyKey>)PK;
 
 @end
 

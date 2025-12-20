@@ -39,18 +39,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
+/**
  *  Default Meta to build ID with 'name@address'
  *
- *  version:
- *      0x01 - MKM
+ *      version:
+ *          0x01 - MKM
  *
- *  algorithm:
- *      CT      = fingerprint = sKey.sign(seed);
- *      hash    = ripemd160(sha256(CT));
- *      code    = sha256(sha256(network + hash)).prefix(4);
- *      address = base58_encode(network + hash + code);
- *      number  = uint(code);
+ *      algorithm:
+ *          CT      = fingerprint = sKey.sign(seed);
+ *          hash    = ripemd160(sha256(CT));
+ *          code    = sha256(sha256(network + hash)).prefix(4);
+ *          address = base58_encode(network + hash + code);
+ *          number  = uint(code);
  */
 @interface DIMDefaultMeta : DIMMeta
 

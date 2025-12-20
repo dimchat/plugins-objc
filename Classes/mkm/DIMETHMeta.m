@@ -63,6 +63,10 @@
     return self;
 }
 
+- (instancetype)initWithType:(NSString *)type key:(id<MKVerifyKey>)PK {
+    return [self initWithType:type key:PK seed:nil fingerprint:nil];
+}
+
 // Override
 - (BOOL)hasSeed {
     return NO;

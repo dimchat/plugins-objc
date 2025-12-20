@@ -48,23 +48,12 @@
     return self;
 }
 
-- (NSString *)getDocumentType:(NSString *)type forID:(id<MKMID>)did {
-    if (![type isEqualToString:@"*"]) {
-        return type;
-    } else if ([did isGroup]) {
-        return MKMDocumentType_Bulletin;
-    } else if ([did isUser]) {
-        return MKMDocumentType_Visa;
-    } else {
-        return MKMDocumentType_Profile;
-    }
-}
-
 // Override
 - (id<MKMDocument>)createDocumentWithData:(nullable NSString *)json
                                 signature:(nullable id<MKTransportableData>)CT {
     NSString *type = [self type];
     if (json && CT) {
+        // create document with data & signature from local storage
         if ([type isEqualToString:MKMDocumentType_Visa]) {
             return [[DIMVisa alloc] initWithData:json signature:CT];
         }
@@ -85,31 +74,31 @@
 }
 
 // Override
-- (nullable id<MKMDocument>)parseDocument:(NSDictionary *)doc {
-    id<MKMID> did = MKMIDParse([doc objectForKey:@"did"]);
-    if (!did) {
-        NSAssert(false, @"document ID not found: %@", doc);
-        return nil;
-    } else if ([doc objectForKey:@"data"] && [doc objectForKey:@"signature"]) {
-        // OK
-    } else {
+- (nullable id<MKMDocument>)parseDocument:(NSDictionary *)info {
+    // check 'did', 'data', 'signature'
+    if ([info objectForKey:@"data"] == nil || [info objectForKey:@"signature"] == nil) {
         // doc.data should not be empty
         // doc.signature should not be empty
-        NSAssert(false, @"document error: %@", doc);
+        NSAssert(false, @"document error: %@", info);
         return nil;
+    //} else if ([info objectForKey:@"did"] == nil) {
+    //    // doc.did should not be empty
+    //    NSAssert(false, @"document error: %@", info);
+    //    return nil;
     }
+    
+    // create document for type
+    id<MKMDocument> doc = nil;
     MKMSharedAccountExtensions *ext = [MKMSharedAccountExtensions sharedInstance];
-    NSString *type = [ext.helper getDocumentType:doc defaultValue:nil];
-    if (!type) {
-        type = [self getDocumentType:@"I" forID:did];
-    }
+    NSString *type = [ext.helper getDocumentType:info defaultValue:nil];
     if ([type isEqualToString:MKMDocumentType_Visa]) {
-        return [[DIMVisa alloc] initWithDictionary:doc];
+        doc = [[DIMVisa alloc] initWithDictionary:info];
+    } else if ([type isEqualToString:MKMDocumentType_Bulletin]) {
+        doc = [[DIMBulletin alloc] initWithDictionary:info];
+    } else {
+        doc = [[DIMDocument alloc] initWithDictionary:info];
     }
-    if ([type isEqualToString:MKMDocumentType_Bulletin]) {
-        return [[DIMBulletin alloc] initWithDictionary:doc];
-    }
-    return [[DIMDocument alloc] initWithDictionary:doc];
+    return doc;
 }
 
 @end

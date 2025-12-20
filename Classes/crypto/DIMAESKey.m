@@ -240,9 +240,10 @@ static inline NSData *random_data(NSUInteger size) {
 
 // Override
 - (nullable id<MKSymmetricKey>)parseSymmetricKey:(NSDictionary *)key {
-    // check 'data'
-    if ([key objectForKey:@"data"] == nil) {
+    // check 'data', 'algorithm'
+    if ([key objectForKey:@"data"] == nil || [key objectForKey:@"algorithm"] == nil) {
         // key.data should not be empty
+        // key.algorithm should not be empty
         NSAssert(false, @"AES key error: %@", key);
         return nil;
     }

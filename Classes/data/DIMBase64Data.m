@@ -116,7 +116,7 @@
 - (nullable id<MKTransportableData>)parseTransportableData:(NSDictionary *)ted {
     // check 'data'
     if ([ted objectForKey:@"data"] == nil) {
-        // key.data should not be empty
+        // ted.data should not be empty
         NSAssert(false, @"TED error: %@", ted);
         return nil;
     }

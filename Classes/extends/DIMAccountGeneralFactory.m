@@ -62,16 +62,18 @@
 }
 
 // Override
-- (nullable NSString *)getMetaType:(NSDictionary<NSString *,id> *)meta defaultValue:(nullable NSString *)aValue {
+- (nullable NSString *)getMetaType:(NSDictionary<NSString *,id> *)meta
+                      defaultValue:(nullable NSString *)aValue {
     id version = [meta objectForKey:@"type"];
     return MKConvertString(version, aValue);
 }
 
 // Override
-- (nullable NSString *)getDocumentType:(NSDictionary<NSString *,id> *)doc defaultValue:(nullable NSString *)aValue {
-    id docType = [doc objectForKey:@"type"];
-    if (docType) {
-        return MKConvertString(docType, aValue);
+- (nullable NSString *)getDocumentType:(NSDictionary<NSString *,id> *)doc
+                          defaultValue:(nullable NSString *)aValue {
+    NSString  *docType = MKConvertString([doc objectForKey:@"type"], nil);
+    if ([docType length] > 0 && ![docType isEqualToString:@"*"]) {
+        return docType;
     } else if (aValue) {
         return aValue;
     }
@@ -265,7 +267,7 @@
 // Override
 - (id<MKMDocument>)createDocumentWithData:(nullable NSString *)json
                                 signature:(nullable id<MKTransportableData>)sig
-                                  forType:(nonnull NSString *)type {
+                                  forType:(NSString *)type {
     id<MKMDocumentFactory> factory = [self getDocumentFactory:type];
     NSAssert(factory, @"document type not supported: %@", type);
     return [factory createDocumentWithData:json signature:sig];

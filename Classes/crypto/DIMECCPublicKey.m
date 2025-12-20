@@ -241,9 +241,10 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
 
 // Override
 - (nullable id<MKPublicKey>)parsePublicKey:(NSDictionary *)key {
-    // check 'data'
-    if ([key objectForKey:@"data"] == nil) {
+    // check 'data', 'algorithm'
+    if ([key objectForKey:@"data"] == nil || [key objectForKey:@"algorithm"] == nil) {
         // key.data should not be empty
+        // key.algorithm should not be empty
         NSAssert(false, @"ECC key error: %@", key);
         return nil;
     }

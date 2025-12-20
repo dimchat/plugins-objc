@@ -170,6 +170,7 @@
 
 @implementation DIMBaseFileFactory
 
+// Override
 - (id<MKPortableNetworkFile>)createPortableNetworkFile:(id<MKTransportableData>)data
                                               filename:(NSString *)name
                                                    url:(NSURL *)locator
@@ -180,7 +181,16 @@
                                            password:key];
 }
 
+// Override
 - (id<MKPortableNetworkFile>)parsePortableNetworkFile:(NSDictionary *)pnf {
+    // check 'data', 'URL', 'filename'
+    if ([pnf objectForKey:@"data"] == nil &&
+        [pnf objectForKey:@"URL"] == nil &&
+        [pnf objectForKey:@"filename"] == nil) {
+        // pnf.data and pnf.URL and pnf.filename should not be empty at the same time
+        NSAssert(false, @"PNF error: %@", pnf);
+        return nil;
+    }
     return [[DIMBaseNetworkFile alloc] initWithDictionary:pnf];
 }
 
