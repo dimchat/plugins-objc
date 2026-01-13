@@ -39,7 +39,7 @@
 
 @interface DIMBase64Data() {
     
-    DIMBaseDataWrapper *_wrapper;
+    id<DIMTEDWrapper> _wrapper;
 }
 
 @end
@@ -49,7 +49,7 @@
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     if (self = [super initWithDictionary:dict]) {
-        _wrapper = [[DIMBaseDataWrapper alloc] initWithDictionary:self.dictionary];
+        _wrapper = [self createWrapper];
     }
     return self;
 }
@@ -57,7 +57,7 @@
 /* designated initializer */
 - (instancetype)init {
     if (self = [super init]) {
-        _wrapper = [[DIMBaseDataWrapper alloc] initWithDictionary:self.dictionary];
+        _wrapper = [self createWrapper];
     }
     return self;
 }
@@ -72,6 +72,13 @@
         }
     }
     return self;
+}
+
+// Override
+- (NSMutableDictionary<NSString *, id> *)dictionary {
+    // serialize data
+    [_wrapper encode];
+    return [super dictionary];
 }
 
 // Override
@@ -93,12 +100,24 @@
 - (NSString *)string {
     // 0. "{BASE64_ENCODE}"
     // 1. "base64,{BASE64_ENCODE}"
+    // 2. "data:image/png;base64,{BASE64_ENCODE}"
     return [_wrapper encode];
 }
 
 - (NSString *)encode:(NSString *)mimeType {
     // 2. "data:image/png;base64,{BASE64_ENCODE}"
     return [_wrapper encode:mimeType];
+}
+
+@end
+
+@implementation DIMBase64Data (Wrapper)
+
+- (id<DIMTEDWrapper>)createWrapper {
+    NSMutableDictionary<NSString *, id> *info = [super dictionary];
+    DIMSharedNetworkFormatAccess *access = [DIMSharedNetworkFormatAccess sharedInstance];
+    id<DIMTEDWrapperFactory> factory = [access tedWrapperFactory];
+    return [factory createTEDWrapper:info];
 }
 
 @end

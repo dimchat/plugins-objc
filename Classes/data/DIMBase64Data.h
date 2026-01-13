@@ -47,6 +47,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// protected
+@interface DIMBase64Data (Wrapper)
+
+- (id<DIMTEDWrapper>)createWrapper;
+
+@end
+
 @interface DIMBase64DataFactory : NSObject <MKTransportableDataFactory>
 
 @end

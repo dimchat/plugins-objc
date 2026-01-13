@@ -35,11 +35,13 @@
 //  Copyright © 2023 DIM Group. All rights reserved.
 //
 
+#import "DIMFormatGeneralFactory.h"
+
 #import "DIMBaseNetworkFile.h"
 
 @interface DIMBaseNetworkFile() {
     
-    DIMBaseFileWrapper *_wrapper;
+    id<DIMPNFWrapper> _wrapper;
 }
 
 @end
@@ -49,8 +51,7 @@
 /* designated initializer */
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     if (self = [super initWithDictionary:dict]) {
-        dict = [self dictionary];
-        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:dict];
+        _wrapper = [self createWrapper];
     }
     return self;
 }
@@ -58,8 +59,7 @@
 /* designated initializer */
 - (instancetype)init {
     if (self = [super init]) {
-        NSMutableDictionary *dict = [self dictionary];
-        _wrapper = [[DIMBaseFileWrapper alloc] initWithDictionary:dict];
+        _wrapper = [self createWrapper];
     }
     return self;
 }
@@ -87,6 +87,13 @@
         }
     }
     return self;
+}
+
+// Override
+- (NSMutableDictionary<NSString *, id> *)dictionary {
+    // serialize data
+    [_wrapper dictionary];
+    return [super dictionary];
 }
 
 // Override
@@ -132,34 +139,54 @@
 
 // Override
 - (NSString *)string {
-    NSString *urlString = [self _urlString];
-    if (urlString) {
-        // only contains 'URL', return the URL string directly
-        return urlString;
+    NSDictionary *info = [self dictionary];
+    NSString *text = [self _getUrlString:info];
+    if (text) {
+        // only contains 'URL',
+        // or this info can be built to a data URI
+        return text;
     }
     // not a single URL, encode the entire dictionary
-    return MKJsonMapEncode([self dictionary]);
+    return MKJsonMapEncode(info);
 }
 
 // Override
 - (NSObject *)object {
-    NSString *urlString = [self _urlString];
-    if (urlString) {
-        // only contains 'URL', return the URL string directly
-        return urlString;
+    NSDictionary *info = [self dictionary];
+    NSString *text = [self _getUrlString:info];
+    if (text) {
+        // only contains 'URL',
+        // or this info can be built to a data URI
+        return text;
     }
     // not a single URL, return the entire dictionary
-    return [self dictionary];
+    return info;
 }
 
-- (NSString *)_urlString {
-    NSUInteger count = [self count];
+- (NSString *)_getUrlString:(NSDictionary *)info {
+    //
+    //  check URL
+    //
+    NSString *urlString = MKConvertString([info objectForKey:@"URL"], nil);
+    if (!urlString) {
+        //
+        //  check data URI
+        //
+        return [DIMDataURI build:info];
+    } else if ([urlString hasPrefix:@"data:"]) {
+        // 'data:...;...,...'
+        return urlString;
+    }
+    //
+    //  check extra params
+    //
+    NSUInteger count = [info count];
     if (count == 1) {
         // if only contains 'URL' field, return the URL string directly
-        return [self stringForKey:@"URL" defaultValue:nil];
+        return urlString;
     } else if (count == 2 && [self objectForKey:@"filename"]) {
         // ignore 'filename' field
-        return [self stringForKey:@"URL" defaultValue:nil];
+        return urlString;
     } else {
         // not a single URL
         return nil;

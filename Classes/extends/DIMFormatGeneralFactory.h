@@ -39,4 +39,60 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// protected
+@interface DIMFormatGeneralFactory (Convenience)
+
+/**
+ *  Parse PNF
+ */
+- (nullable NSDictionary *)parseURL:(nullable id)pnf;
+
+/**
+ *  Parse TED
+ */
+- (nullable NSDictionary *)parseData:(nullable id)ted;
+
+- (nullable NSDictionary *)getMap:(nullable id)value;
+
+- (nullable NSDictionary *)parseDataURI:(nullable NSString *)text;
+
+@end
+
+#pragma mark -
+
+/**
+ *  "data:image/png;base64,{BASE64_ENCODE}"
+ */
+@interface DIMDataURI : NSObject
+
+@property (readonly, strong, nonatomic, nullable) NSString *mimeType;
+@property (readonly, strong, nonatomic, nullable) NSString *encoding;
+@property (readonly, strong, nonatomic) NSString *body;
+
+// toMap()
+@property (readonly, copy, nonatomic) NSDictionary *dictionary;
+
+- (instancetype)initWithType:(nullable NSString *)mimeType
+                    encoding:(nullable NSString *)algorithm
+                        body:(NSString *)data
+NS_DESIGNATED_INITIALIZER;
+
+/**
+ *  Split text string for data URI
+ *
+ *      0. "{TEXT}", or "{URL}"
+ *      1. "base64,{BASE64_ENCODE}"
+ *      2. "data:image/png;base64,{BASE64_ENCODE}"
+ */
++ (instancetype)parse:(nullable NSString *)text;
+
+/**
+ *  Build data URI
+ *
+ *      format: "data:image/png;base64,{BASE64_ENCODE}"
+ */
++ (nullable NSString *)build:(NSDictionary *)info;
+
+@end
+
 NS_ASSUME_NONNULL_END

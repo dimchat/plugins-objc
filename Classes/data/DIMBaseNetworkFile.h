@@ -48,6 +48,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// protected
+@interface DIMBaseNetworkFile (Wrapper)
+
+- (id<DIMPNFWrapper>)createWrapper;
+
+@end
+
 @interface DIMBaseFileFactory : NSObject <MKPortableNetworkFileFactory>
 
 @end

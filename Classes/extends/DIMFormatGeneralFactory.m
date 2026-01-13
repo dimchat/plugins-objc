@@ -42,20 +42,6 @@
 
 @end
 
-static inline NSInteger _index_of(NSString *sub, NSString *text) {
-    NSRange range = [text rangeOfString:sub];
-    NSUInteger pos = range.location;
-    if (pos == NSNotFound) {
-        return -1;
-    }
-    return pos;
-}
-
-static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger end) {
-    NSRange rang = NSMakeRange(start, end - start);
-    return [text substringWithRange:rang];
-}
-
 @implementation DIMFormatGeneralFactory
 
 - (instancetype)init {
@@ -66,95 +52,7 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
     return self;
 }
 
-/**
- *  Split text string to array: ["{TEXT}", "{algorithm}", "{content-type}"]
- */
-- (NSArray<NSString *> *)split:(NSString *)text {
-    NSMutableArray<NSString *> *array = [[NSMutableArray alloc] init];
-    // "{TEXT}", or
-    // "base64,{BASE64_ENCODE}", or
-    // "data:image/png;base64,{BASE64_ENCODE}"
-    NSInteger pos1 = _index_of(@"://", text);
-    if (pos1 > 0) {
-        //
-        //  1. [URL]
-        //
-        [array addObject:text];
-        return array;
-    } else {
-        // skip 'data:'
-        pos1 = _index_of(@":", text) + 1;
-    }
-    // seeking for 'content-type'
-    NSInteger pos2 = _index_of(@";", text) + 1;
-    if (pos2 == 0) {
-        pos2 = pos1;
-    }
-    // seeking for 'algorithm'
-    NSInteger pos3 = _index_of(@",", text) + 1;
-    if (pos3 == 0) {
-        pos3 = pos2;
-    }
-    if (pos3 == 0) {
-        //
-        //  2. [data]
-        //
-        [array addObject:text];
-        return array;
-    } else {
-        // add 'data'
-        NSString *data = [text substringFromIndex:pos3];
-        [array addObject:data];
-    }
-    // add 'algorithm'
-    if (pos3 > pos2) {
-        NSString *algorithm = _sub_string(text, pos2, pos3);
-        [array addObject:algorithm];
-    }
-    // add 'content-type'
-    if (pos2 > pos1) {
-        NSString *type = _sub_string(text, pos1, pos2);
-        [array addObject:type];
-    }
-    //
-    //  3. [data, algorithm, type]
-    //
-    return array;
-}
-
-- (NSDictionary *)decode:(id)data defaultKey:(NSString *)aKey {
-    if ([data conformsToProtocol:@protocol(MKDictionary)]) {
-        return [data dictionary];
-    } else if ([data isKindOfClass:[NSDictionary class]]) {
-        return data;
-    }
-    NSString *text = [data isKindOfClass:[NSString class]] ? data : [data description];
-    if ([text length] == 0) {
-        return nil;
-    } else if ([text hasPrefix:@"{"] && [text hasSuffix:@"}"]) {
-        return MKJsonMapDecode(text);
-    }
-    NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
-    NSArray *array = [self split:text];
-    NSUInteger size = [array count];
-    if (size == 1) {
-        [info setObject:array.firstObject forKey:aKey];
-    } else if (size == 2) {
-        [info setObject:array.firstObject forKey:@"data"];
-        [info setObject:array.lastObject forKey:@"algorithm"];
-    } else {
-        NSAssert(size == 3, @"split error: %@ => %@", text, array);
-        // 'data:...;...,...'
-        [info setObject:[array objectAtIndex:0] forKey:@"data"];
-        [info setObject:[array objectAtIndex:1] forKey:@"algorithm"];
-        [info setObject:[array objectAtIndex:2] forKey:@"content-type"];
-        if ([text hasPrefix:@"data:"]) {
-            [info setObject:text forKey:@"URL"];
-        }
-    }
-    return info;
-}
-
+// Override
 - (nullable NSString *)getFormatAlgorithm:(NSDictionary<NSString *,id> *)ted
                              defaultValue:(nullable NSString *)aValue {
     id algorithm = [ted objectForKey:@"algorithm"];
@@ -163,15 +61,18 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
 
 #pragma mark TED - Transportable Encoded Data
 
+// Override
 - (void)setTransportableDataFactory:(id<MKTransportableDataFactory>)factory
                           algorithm:(NSString *)name {
     [_tedFactories setObject:factory forKey:name];
 }
 
+// Override
 - (nullable id<MKTransportableDataFactory>)getTransportableDataFactory:(NSString *)algorithm {
     return [_tedFactories objectForKey:algorithm];
 }
 
+// Override
 - (id<MKTransportableData>)createTransportableData:(NSData *)data
                                          algorithm:(NSString *)name {
     if ([name length] == 0) {
@@ -182,6 +83,7 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
     return [factory createTransportableData:data];
 }
 
+// Override
 - (nullable id<MKTransportableData>)parseTransportableData:(nullable id)ted {
     if (!ted) {
         return nil;
@@ -189,7 +91,7 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
         return ted;
     }
     // unwrap
-    NSDictionary *info = [self decode:ted defaultKey:@"data"];
+    NSDictionary *info = [self parseData:ted];
     if (!info) {
         //NSAssert(false, @"TED error: %@", ted);
         return nil;
@@ -207,14 +109,17 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
 
 #pragma mark PNF - Portable Network File
 
+// Override
 - (void)setPortableNetworkFileFactory:(id<MKPortableNetworkFileFactory>)factory {
     _pnfFactory = factory;
 }
 
+// Override
 - (nullable id<MKPortableNetworkFileFactory>)getPortableNetworkFileFactory {
     return _pnfFactory;
 }
 
+// Override
 - (id<MKPortableNetworkFile>)createPortableNetworkFile:(nullable id<MKTransportableData>)data
                                               filename:(nullable NSString *)name
                                                    url:(nullable NSURL *)location
@@ -227,14 +132,15 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
                                      password:key];
 }
 
-- (nullable id<MKPortableNetworkFile>)parsePortableNetworkFile:(nullable id)pnf { 
+// Override
+- (nullable id<MKPortableNetworkFile>)parsePortableNetworkFile:(nullable id)pnf {
     if (!pnf) {
         return nil;
     } else if ([pnf conformsToProtocol:@protocol(MKPortableNetworkFile)]) {
         return pnf;
     }
     // unwrap
-    NSDictionary *info = [self decode:pnf defaultKey:@"URL"];
+    NSDictionary *info = [self parseURL:pnf];
     if (!info) {
         //NSAssert(false, @"PNF error: %@", ted);
         return nil;
@@ -242,6 +148,192 @@ static inline NSString *_sub_string(NSString *text, NSUInteger start, NSUInteger
     id<MKPortableNetworkFileFactory> factory = [self getPortableNetworkFileFactory];
     NSAssert(factory, @"PNF factory not ready");
     return [factory parsePortableNetworkFile:info];
+}
+
+@end
+
+@implementation DIMFormatGeneralFactory (Convenience)
+
+- (nullable NSDictionary *)parseURL:(nullable id)pnf {
+    NSDictionary *info = [self getMap:pnf];
+    if (!info) {
+        // parse data URI from text string
+        NSString *text = MKConvertString(pnf, nil);
+        info = [self parseDataURI:text];
+        if (!info) {
+            // data URI
+            NSAssert([text containsString:@"://"] != YES, @"PNF data error: %@", pnf);
+            //if ([text containsString:@"://"] == YES) {
+            //    [(NSMutableDictionary *)info setObject:text forKey:@"URI"];
+            //}
+        } else if ([text containsString:@"://"] == YES) {
+            // [URL]
+            info = @{
+                @"URL": text,
+            };
+        }
+    }
+    return info;
+}
+
+- (nullable NSDictionary *)parseData:(nullable id)ted {
+    NSDictionary *info = [self getMap:ted];
+    if (!info) {
+        // parse data URI from text string
+        NSString *text = MKConvertString(ted, nil);
+        info = [self parseDataURI:text];
+        if (!info) {
+            NSAssert([text containsString:@"://"] != YES, @"TED data error: %@", ted);
+            // [TEXT]
+            info = @{
+                @"data": text,
+            };
+        }
+    }
+    return info;
+}
+
+- (nullable NSDictionary *)getMap:(nullable id)value {
+    if (!value) {
+        return nil;
+    } else if ([value conformsToProtocol:@protocol(MKDictionary)]) {
+        return [value dictionary];
+    } else if ([value isKindOfClass:[NSDictionary class]]) {
+        return value;
+    }
+    NSString *text = MKConvertString(value, nil);
+    if ([text length] < 8) {
+        return nil;
+    } else if ([text hasPrefix:@"{"] && [text hasSuffix:@"}"]) {
+        // from JSON string
+        return MKJsonMapDecode(text);
+    } else {
+        return nil;
+    }
+}
+
+- (nullable NSDictionary *)parseDataURI:(nullable NSString *)text {
+    DIMDataURI *uri = [DIMDataURI parse:text];
+    return [uri dictionary];
+}
+
+@end
+
+#pragma mark -
+
+@interface DIMDataURI ()
+
+@property (strong, nonatomic, nullable) NSString *mimeType;
+@property (strong, nonatomic, nullable) NSString *encoding;
+@property (strong, nonatomic) NSString *body;
+
+@end
+
+@implementation DIMDataURI
+
+- (instancetype)init {
+    NSAssert(false, @"DON'T call me!");
+    NSString *date = nil;
+    return [self initWithType:nil encoding:nil body:date];
+}
+
+/* designated initializer */
+- (instancetype)initWithType:(nullable NSString *)mimeType
+                    encoding:(nullable NSString *)algorithm
+                        body:(NSString *)data {
+    if (self = [super init]) {
+        self.mimeType = mimeType;
+        self.encoding = algorithm;
+        self.body = data;
+    }
+    return self;
+}
+
+- (NSDictionary *)dictionary {
+    NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+    [info setObject:self.body forKey:@"data"];
+    // 'mime-type'
+    NSString *mimeType = self.mimeType;
+    if (mimeType) {
+        [info setObject:mimeType forKey:@"mime-type"];
+    }
+    // 'encoding'
+    NSString *algorithm = self.encoding;
+    if (algorithm) {
+        [info setObject:algorithm forKey:@"algorithm"];
+    }
+    return info;
+}
+
++ (instancetype)parse:(nullable NSString *)text {
+    if ([text length] == 0) {
+        return nil;
+    }
+    NSRange range;
+    if ([text hasPrefix:@"data:"]) {
+        // "data:image/png;base64,{BASE64_ENCODE}"
+        text = [text substringFromIndex:5];
+        range = [text rangeOfString:@","];
+        if (range.location == NSNotFound) {
+            NSAssert(false, @"data URI error: %@", text);
+            return nil;
+        }
+    } else {
+        // "base64,{BASE64_ENCODE}"
+        range = [text rangeOfString:@","];
+        if (range.location == NSNotFound || range.location > 8) {
+            // "{TEXT}", or "{URL}"
+            return nil;
+        }
+    }
+    NSString *body = [text substringFromIndex:(range.location + 1)];
+    NSString *head = [text substringToIndex:(range.location)];
+    // split for 'mime-type' + 'encoding'
+    range = [head rangeOfString:@";"];
+    if (range.location == NSNotFound) {
+        // "base64,{BASE64_ENCODE}"
+        return [[DIMDataURI alloc] initWithType:nil encoding:head body:body];
+    }
+    NSAssert(range.location > 0, @"data URI error: %@", text);
+    // "data:image/png;base64,{BASE64_ENCODE}"
+    NSString *mimeType = [head substringToIndex:(range.location)];
+    NSString *encoding = [head substringFromIndex:(range.location + 1)];
+    return [[DIMDataURI alloc] initWithType:mimeType encoding:encoding body:body];
+}
+
++ (nullable NSString *)build:(NSDictionary *)info {
+    //
+    //  1. check encoded data & content type
+    //
+    NSString *data = [info objectForKey:@"data"];
+    NSString *mime = [info objectForKey:@"mime-type"];
+    if (!data || !mime) {
+        // params not matched
+        return nil;
+    } else {
+        NSAssert([data isKindOfClass:[NSString class]] && [mime isKindOfClass:[NSString class]], @"params error: %@", info);
+    }
+    //
+    //  2. check extra params
+    //
+    NSInteger count = [info count];
+    if ([info objectForKey:@"filename"]) {
+        count -= 1;
+    }
+    NSString *algorithm = [info objectForKey:@"algorithm"];
+    if (algorithm) {
+        count -= 1;
+    } else {
+        algorithm = MKEncodeAlgorithm_BASE64;
+    }
+    if (count != 2) {
+        // extra params exist, cannot build data URI
+        return nil;
+    }
+    //
+    //  3. build string: 'data:...;...,...'
+    //
+    return [[NSString alloc] initWithFormat:@"data:%@;%@,%@", mime, algorithm, data];
 }
 
 @end
