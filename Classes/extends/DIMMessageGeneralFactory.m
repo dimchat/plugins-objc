@@ -63,6 +63,7 @@
     return self;
 }
 
+// Override
 - (nullable NSString *)getContentType:(NSDictionary<NSString *,id> *)content
                          defaultValue:(nullable NSString *)aValue {
     id type = [content objectForKey:@"type"];
@@ -71,14 +72,17 @@
 
 #pragma mark Content
 
+// Override
 - (void)setContentFactory:(id<DKDContentFactory>)factory forType:(NSString *)type {
     [_contentFactories setObject:factory forKey:type];
 }
 
+// Override
 - (nullable id<DKDContentFactory>)getContentFactory:(NSString *)type {
     return [_contentFactories objectForKey:type];
 }
 
+// Override
 - (id<DKDContent>)parseContent:(nullable id)content {
     if (!content) {
         return nil;
@@ -104,14 +108,17 @@
 
 #pragma mark Envelope
 
+// Override
 - (void)setEnvelopeFactory:(id<DKDEnvelopeFactory>)factory {
     _envelopeFactory = factory;
 }
 
+// Override
 - (nullable id<DKDEnvelopeFactory>)getEnvelopeFactory {
     return _envelopeFactory;
 }
 
+// Override
 - (id<DKDEnvelope>)createEnvelopeWithSender:(id<MKMID>)from
                                    receiver:(id<MKMID>)to
                                        time:(nullable NSDate *)when {
@@ -120,7 +127,8 @@
     return [factory createEnvelopeWithSender:from receiver:to time:when];
 }
 
-- (nullable id<DKDEnvelope>)parseEnvelope:(nullable id)env { 
+// Override
+- (nullable id<DKDEnvelope>)parseEnvelope:(nullable id)env {
     if (!env) {
         return nil;
     } else if ([env conformsToProtocol:@protocol(DKDEnvelope)]) {
@@ -138,14 +146,17 @@
 
 #pragma mark InstantMessage
 
+// Override
 - (void)setInstantMessageFactory:(id<DKDInstantMessageFactory>)factory {
     _instantMessageFactory = factory;
 }
 
+// Override
 - (nullable id<DKDInstantMessageFactory>)getInstantMessageFactory {
     return _instantMessageFactory;
 }
 
+// Override
 - (id<DKDInstantMessage>)createInstantMessageWithEnvelope:(id<DKDEnvelope>)head
                                                   content:(id<DKDContent>)body {
     id<DKDInstantMessageFactory> factory = [self getInstantMessageFactory];
@@ -153,13 +164,15 @@
     return [factory createInstantMessageWithEnvelope:head content:body];
 }
 
+// Override
 - (DKDSerialNumber)generateSerialNumberForType:(NSString *)type time:(NSDate *)now {
     id<DKDInstantMessageFactory> factory = [self getInstantMessageFactory];
     NSAssert(factory, @"instant message factory not ready");
     return [factory generateSerialNumberForType:type time:now];
 }
 
-- (nullable id<DKDInstantMessage>)parseInstantMessage:(nullable id)msg { 
+// Override
+- (nullable id<DKDInstantMessage>)parseInstantMessage:(nullable id)msg {
     if (!msg) {
         return nil;
     } else if ([msg conformsToProtocol:@protocol(DKDInstantMessage)]) {
@@ -177,15 +190,18 @@
 
 #pragma mark SecureMessage
 
+// Override
 - (void)setSecureMessageFactory:(id<DKDSecureMessageFactory>)factory {
     _secureMessageFactory = factory;
 }
 
-- (nullable id<DKDSecureMessageFactory>)getSecureMessageFactory { 
+// Override
+- (nullable id<DKDSecureMessageFactory>)getSecureMessageFactory {
     return _secureMessageFactory;
 }
 
-- (nullable id<DKDSecureMessage>)parseSecureMessage:(nullable id)msg { 
+// Override
+- (nullable id<DKDSecureMessage>)parseSecureMessage:(nullable id)msg {
     if (!msg) {
         return nil;
     } else if ([msg conformsToProtocol:@protocol(DKDSecureMessage)]) {
@@ -203,15 +219,18 @@
 
 #pragma mark ReliableMessage
 
+// Override
 - (void)setReliableMessageFactory:(id<DKDReliableMessageFactory>)factory {
     _reliableMessageFactory = factory;
 }
 
-- (nullable id<DKDReliableMessageFactory>)getReliableMessageFactory { 
+// Override
+- (nullable id<DKDReliableMessageFactory>)getReliableMessageFactory {
     return _reliableMessageFactory;
 }
 
-- (nullable id<DKDReliableMessage>)parseReliableMessage:(nullable id)msg { 
+// Override
+- (nullable id<DKDReliableMessage>)parseReliableMessage:(nullable id)msg {
     if (!msg) {
         return nil;
     } else if ([msg conformsToProtocol:@protocol(DKDReliableMessage)]) {

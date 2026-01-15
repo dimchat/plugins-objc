@@ -39,7 +39,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*
+/**
  *  Address like BitCoin
  *
  *      data format: "network+digest+code"

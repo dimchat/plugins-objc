@@ -316,7 +316,6 @@ NS_ASSUME_NONNULL_END
 @implementation DIMLibraryLoader
 
 - (instancetype)init {
-    NSAssert(false, @"DON'T call me");
     DIMExtensionLoader *extensionLoader = nil;
     DIMPluginLoader *pluginLoader = nil;
     return [self initWithExtensionLoader:extensionLoader andPluginLoader:pluginLoader];
@@ -373,5 +372,5 @@ You must ensure that every ```Address``` you extend has a ```Meta``` type that c
 
 ----
 
-Copyright &copy; 2018-2025 Albert Moky
+Copyright &copy; 2018-2026 Albert Moky
 [![Followers](https://img.shields.io/github/followers/moky)](https://github.com/moky?tab=followers)

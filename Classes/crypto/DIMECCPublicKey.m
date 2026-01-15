@@ -211,6 +211,8 @@ static inline int ecc_der_to_sig(const uint8_t *der, int der_len, uint8_t *sig_6
                     //@throw [NSException exceptionWithName:@"ECCKeyError" reason:@"not support" userInfo:self.dictionary];
                 }
             }
+        } else {
+            NSAssert(false, @"ECC public key not found: %@", self);
         }
         _keyData = bin;
     }

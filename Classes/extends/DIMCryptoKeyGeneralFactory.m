@@ -53,6 +53,7 @@
     return self;
 }
 
+// Override
 - (nullable NSString *)getKeyAlgorithm:(NSDictionary<NSString *,id> *)key
                           defaultValue:(nullable NSString *)aValue {
     id algo = [key objectForKey:@"algorithm"];
@@ -61,21 +62,25 @@
 
 #pragma mark SymmetricKey
 
+// Override
 - (void)setSymmetricKeyFactory:(id<MKSymmetricKeyFactory>)factory
                      algorithm:(NSString *)name {
     [_symmetricFactories setObject:factory forKey:name];
 }
 
+// Override
 - (nullable id<MKSymmetricKeyFactory>)getSymmetricKeyFactory:(NSString *)algorithm {
     return [_symmetricFactories objectForKey:algorithm];
 }
 
+// Override
 - (nullable id<MKSymmetricKey>)generateSymmetricKey:(NSString *)algorithm {
     id<MKSymmetricKeyFactory> factory = [self getSymmetricKeyFactory:algorithm];
     NSAssert(factory, @"key algorithm not support: %@", algorithm);
     return [factory generateSymmetricKey];
 }
 
+// Override
 - (nullable id<MKSymmetricKey>)parseSymmetricKey:(nullable id)key {
     if (!key) {
         return nil;
@@ -100,22 +105,26 @@
 
 #pragma mark PrivateKey
 
+// Override
 - (void)setPrivateKeyFactory:(id<MKPrivateKeyFactory>)factory
                    algorithm:(NSString *)name {
     [_privateFactories setObject:factory forKey:name];
 }
 
+// Override
 - (nullable id<MKPrivateKeyFactory>)getPrivateKeyFactory:(NSString *)algorithm {
     return [_privateFactories objectForKey:algorithm];
 }
 
+// Override
 - (nullable id<MKPrivateKey>)generatePrivateKey:(NSString *)algorithm {
     id<MKPrivateKeyFactory> factory = [self getPrivateKeyFactory:algorithm];
     NSAssert(factory, @"key algorithm not support: %@", algorithm);
     return [factory generatePrivateKey];
 }
 
-- (nullable id<MKPrivateKey>)parsePrivateKey:(nullable id)key { 
+// Override
+- (nullable id<MKPrivateKey>)parsePrivateKey:(nullable id)key {
     if (!key) {
         return nil;
     } else if ([key conformsToProtocol:@protocol(MKPrivateKey)]) {
@@ -139,16 +148,19 @@
 
 #pragma mark PublicKey
 
+// Override
 - (void)setPublicKeyFactory:(id<MKPublicKeyFactory>)factory
                   algorithm:(NSString *)name {
     [_publicFactories setObject:factory forKey:name];
 }
 
+// Override
 - (nullable id<MKPublicKeyFactory>)getPublicKeyFactory:(NSString *)algorithm {
     return [_publicFactories objectForKey:algorithm];
 }
 
-- (nullable id<MKPublicKey>)parsePublicKey:(nullable id)key { 
+// Override
+- (nullable id<MKPublicKey>)parsePublicKey:(nullable id)key {
     if (!key) {
         return nil;
     } else if ([key conformsToProtocol:@protocol(MKPublicKey)]) {

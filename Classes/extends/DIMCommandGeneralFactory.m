@@ -54,6 +54,7 @@
     return self;
 }
 
+// Override
 - (nullable NSString *)getCmd:(NSDictionary<NSString *,id> *)content defaultValue:(nullable NSString *)aValue {
     id cmd = [content objectForKey:@"command"];
     return MKConvertString(cmd, aValue);
@@ -61,15 +62,18 @@
 
 #pragma mark Command
 
+// Override
 - (void)setCommandFactory:(id<DKDCommandFactory>)factory cmd:(NSString *)cmd {
     [_commandFactories setObject:factory forKey:cmd];
 }
 
+// Override
 - (nullable id<DKDCommandFactory>)getCommandFactory:(NSString *)cmd {
     return [_commandFactories objectForKey:cmd];
 }
 
-- (nullable id<DKDCommand>)parseCommand:(nullable id)content { 
+// Override
+- (nullable id<DKDCommand>)parseCommand:(nullable id)content {
     if (!content) {
         return content;
     } else if ([content conformsToProtocol:@protocol(DKDCommand)]) {
